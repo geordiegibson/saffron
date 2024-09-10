@@ -1,5 +1,5 @@
 # saffron
-hacksecret4 hackathon - build dApps with decentralised centralised computing 
+dApp with decentralised centralised computing for HackSecret4 Hackathon
 
 ## Authors
 Tom Barthelmeh
