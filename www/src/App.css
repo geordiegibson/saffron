@@ -1,0 +1,69 @@
+.coin-hover-primary {
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .coin-hover-secondary {
+    animation: float2 5s ease-in-out infinite;
+  }
+  
+  .coin {
+    opacity: 0;
+    transform: scale(0);
+    animation: popIn 0.4s ease forwards;
+  }
+  
+  .coin-primary {
+    animation-delay: 0s; 
+  }
+  
+  .coin-secondary {
+    animation-delay: 0.4s;
+  }
+
+
+  .text-animation {
+    animation: textIn 0.6s ease forwards;
+    animation-delay: 0.8s; 
+    opacity: 0;
+  }
+
+  
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes textIn {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(-10px); 
+    }
+  }
+  
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px); 
+    }
+  }
+
+  @keyframes float2 {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);  /* Moves the coin 10px upwards */
+    }
+  }
