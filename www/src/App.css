@@ -9,7 +9,7 @@
   .coin {
     opacity: 0;
     transform: scale(0);
-    animation: popIn 0.4s ease forwards;
+    animation: popIn 0.8s ease forwards;
   }
   
   .coin-primary {
