@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import ProfilePicture from "./Avatar"
 
 const Navbar = () => {
 
@@ -10,7 +10,9 @@ const Navbar = () => {
                 <h1 className='text-white font-bold text-lg geist'>saffron.</h1>
             </div>
 
-            <Link className="bg-white text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold" to="/">Add Wallet</Link>
+            <ProfilePicture />
+
+            {/* <Link className="bg-white text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold" to="/">Add Wallet</Link> */}
 
         </div>
     )
