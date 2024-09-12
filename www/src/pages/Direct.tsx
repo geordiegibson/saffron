@@ -4,16 +4,14 @@ const Direct = () => {
     return (
         <div className="flex flex-col min-h-screen w-screen">
 
-            {/* <div className="fixed top-0 left-0 w-full">
-                <Navbar />
-            </div> */}
-
-            <div className="flex flex-col pt-10 pb-5 ml-96">
+            <div className="flex flex-col pt-10 pb-5 ml-96 top-animation">
                 <p className="text-neutral-400 font-bold">Send Directly</p>
                 <p className="text-white inter" style={{"fontSize": "30px"}}>🚀 Transfer</p>
             </div>
 
-            <div className="flex justify-center items-center w-full px-96 gap-2">
+            <div className="bottom-animation">
+                
+                <div className="flex justify-center items-center w-full px-96 gap-2">
 
                 {/* Search Bar */}
                 <div className="relative w-full">
@@ -25,20 +23,25 @@ const Direct = () => {
                 <button className="bg-white w-max p-3 rounded">
                     <svg fill="black" className="h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
                 </button>
-            </div>
+                </div>
 
-            {/* Filters */}
-            <div className="flex ml-96 mt-5 gap-5">
+                {/* Filters */}
+                <div className="flex ml-96 mt-5 gap-5">
                 <button className="bg-neutral-800 text-white w-max text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold">Give ^</button>
                 <button className="bg-neutral-800 text-white w-max text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold" >Receive ^</button>
                 <button className="bg-neutral-800 text-white w-max text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold">Value ^</button>
+                </div>
+
+                <div className="flex items-center justify-center h-full w-full">
+                <p className="text-white font-bold">No Contracts 🥺</p>
+                </div>
+
             </div>
 
-            <div className="flex items-center justify-center h-full w-full">
-                <p className="text-white font-bold">No Contracts 🥺</p>
-            </div>
+            
 
             <Menu page='direct'/>
+
         </div>
     )
 }

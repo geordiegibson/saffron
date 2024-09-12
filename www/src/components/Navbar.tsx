@@ -11,9 +11,6 @@ const Navbar = () => {
             </div>
 
             <ProfilePicture />
-
-            {/* <Link className="bg-white text-sm text-gray-800 flex items-center rounded p-4 h-6 font-bold" to="/">Add Wallet</Link> */}
-
         </div>
     )
 }
