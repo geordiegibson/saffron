@@ -12,17 +12,17 @@ const Home = () => {
             
             <div className="flex flex-col items-center text-center w-full">
 
-                <div className="flex justify-center items-end w-full gap-4">
-                    <img className='h-32 coin coin-secondary drop-shadow-darker' src='images/ethereum.png' />
-                    <img className="coin coin-primary drop-shadow-darker" src='images/secret.png' />
-                    <img className='h-32 coin coin-secondary drop-shadow-darker' src='images/bitcoin.png' />
+                <div className="flex justify-center items-end w-full gap-2 lg:gap-4">
+                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/ethereum.png' />
+                    <img className="h-36 lg:h-max coin coin-primary drop-shadow-darker" src='images/secret.png' />
+                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/bitcoin.png' />
                 </div>
 
                 <div className="animate text-animation flex flex-grow flex-col items-center text-center ">
 
                     <div className="flex gap-1 mt-16 inter">
-                        <h1 className="drop-shadow-darker text-white">Trade tokens,</h1>
-                        <div className="bg-clip-text text-transparent bg-gradient-to-r from-[#3e78b2] to-[#004ba8] drop-shadow-darker"><h1>effortlessly.</h1></div>
+                        <h1 className="text-2xl lg:text-5xl drop-shadow-darker text-white">Trade tokens,</h1>
+                        <div className="bg-clip-text text-transparent bg-gradient-to-r from-[#3e78b2] to-[#004ba8] drop-shadow-darker"><h1 className="text-2xl lg:text-5xl">effortlessly.</h1></div>
                     </div>
 
                     <div className="font-bold mt-5 text-gray-400 geist drop-shadow-darker"><p>Allowing users to swap arbitrary tokens in a peer-to-peer manner.</p></div>
