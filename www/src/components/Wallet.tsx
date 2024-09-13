@@ -27,7 +27,7 @@ const Wallet = (props: any) => {
         const keplrOfflineSigner = window.keplr.getOfflineSignerOnlyAmino(CHAIN_ID);
         const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
 
-        const secretjs = new SecretNetworkClient({
+        new SecretNetworkClient({
         url: "https://api.pulsar3.scrttestnet.com",
         chainId: CHAIN_ID,
         wallet: keplrOfflineSigner,
