@@ -1,5 +1,5 @@
 import Menu from "../components/Menu"
-import { SecretNetworkClient } from "secretjs";
+// import { SecretNetworkClient } from "secretjs";
 
 declare global {
     interface Window {
