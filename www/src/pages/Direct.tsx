@@ -29,9 +29,8 @@ const Direct = () => {
 
                 {/* Filters */}
                 <div className="flex mt-5 gap-1 lg:gap-3">
-                    <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
-                    <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
-                    <button className="bg-neutral-800 text-white text-sm xs:text-xs text-gray-800 flex items-center rounded py-4 px-3 h-6  font-bold">Value <i className="pl-2 bi bi-chevron-down"></i></button>
+                    <button className="bg-zinc-900 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
+                    <button className="bg-zinc-900 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
                 </div>
 
                 {/* Contracts */}
