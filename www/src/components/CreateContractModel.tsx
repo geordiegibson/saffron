@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import CryptoInput from './CryptoSelect';
-import Dropdown from './Dropdown';
+import CryptoInput from './crypto/CryptoSelect';
+import Dropdown from './common/Dropdown';
 
 const CreateContractModel = () => (
   <Dialog.Root>

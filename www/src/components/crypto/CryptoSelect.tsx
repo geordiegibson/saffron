@@ -1,4 +1,4 @@
-import AvatarSelect from "./AvatarSelect";
+import AvatarSelect from "./CoinDropdown";
 
 export default function Example() {
     return (

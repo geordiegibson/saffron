@@ -1,12 +1,13 @@
 import { useState } from "react";
 import AvatarStack from "../components/AvatarStack"
 import Menu from "../components/Menu"
-import CreateContractModel from "../components/Model";
+import CreateContractModel from "../components/CreateContractModel";
+import CoinFilter from "../components/crypto/CoinFilter";
 
 const Trade = () => {
     
-    const [givingFilters, setGivingFilters] = useState(["secret", "bitcoin", "ethereum", "", ""]);
-    const [recevingFilters, setRecevingFilters] = useState(["secret", "bitcoin", "ethereum"]);
+    const [givingFilters, setGivingFilters] = useState([]);
+    const [recevingFilters, setRecevingFilters] = useState([]);
 
     const clearFilters = () => {
         setGivingFilters([]);
@@ -44,8 +45,8 @@ const Trade = () => {
 
                     {/* Dropdowns */}
                     <div className="flex gap-1 lg:gap-3">
-                        <button className="bg-zinc-900 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
-                        <button className="bg-zinc-900 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
+                        <CoinFilter name="Give" filter={givingFilters} updateFilter={setGivingFilters}/>
+                        <CoinFilter name="Receive" filter={recevingFilters} updateFilter={setRecevingFilters}/>
                     </div>
 
                         {/* Filter Display */}

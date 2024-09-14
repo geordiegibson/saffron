@@ -19,9 +19,15 @@ const coins = [
     name: 'BTC',
     avatar: 'images/bitcoin.png',
   },
+  {
+    id: 3,
+    name: 'SHD',
+    avatar: 'images/shade.svg',
+  },
+  
 ]
 
-export default function AvatarSelect() {
+const CoinDropdown = () => {
   const [selected, setSelected] = useState(coins[0])
 
   return (
@@ -60,3 +66,5 @@ export default function AvatarSelect() {
     </Listbox>
   )
 }
+
+export default CoinDropdown
