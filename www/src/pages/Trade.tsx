@@ -1,3 +1,4 @@
+import AvatarStack from "../components/AvatarStack"
 import Menu from "../components/Menu"
 
 const Trade = () => {
@@ -31,11 +32,25 @@ const Trade = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="flex mt-5 gap-1 lg:gap-3">
+                <div className="flex mt-5 gap-1 items-center lg:gap-3">
                     <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
                     <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
-                    <button className="bg-neutral-800 text-white text-sm xs:text-xs text-gray-800 flex items-center rounded py-4 px-3 h-6  font-bold">Value <i className="pl-2 bi bi-chevron-down"></i></button>
+
+                    <div className="hidden lg:flex mx-1 h-5 w-[1px] bg-black/10 bg-white/20 md:mx-2"></div>
+
+                    <div className="hidden lg:flex items-center gap-2">
+                        <p className="text-neutral-400 text-xs geist">Giving</p>
+                        <AvatarStack coins={["secret", "bitcoin"]}/>
+                    </div>
+
+                    <div className="hidden lg:flex items-center gap-2 ml-2">
+                        <p className="text-neutral-400 text-xs geist">Receiving</p>
+                        <AvatarStack coins={["secret", "bitcoin", "ethereum", ""]}/>
+                    </div>
+
+                    <p className="hidden lg:flex inline-block h-8 w-8 rounded-full ring-1 ring-neutral-700 bg-neutral-900 text-white flex justify-center items-center"><i className="bi bi-x-lg"></i></p>
                 </div>
+
 
                 {/* Contracts */}
                 {/* <div className="flex gap-2 justify-center">
