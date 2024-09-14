@@ -1,4 +1,4 @@
-import Dropdown from "../components/Dropdown"
+import Dropdown from "../components/MenuDropdown"
 import Alert from "../components/Alert"
 import ProfilePicture from "../components/Avatar"
 import Menu from "../components/Menu"
