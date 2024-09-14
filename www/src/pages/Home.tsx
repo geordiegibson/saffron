@@ -32,9 +32,7 @@ const Home = () => {
                         <div className="absolute bottom-0 left-0 w-full h-1 bg-[#6b100d] scale-x-0 group-hover:scale-x-100 transform origin-left transition-transform duration-300"></div>
                     </div>
                 </div>
-
                 
-
             </div>
 
         </div>
