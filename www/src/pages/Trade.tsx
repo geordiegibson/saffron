@@ -2,7 +2,6 @@ import { useState } from "react";
 import AvatarStack from "../components/AvatarStack"
 import Menu from "../components/Menu"
 import CreateContractModel from "../components/Model";
-import TradeItem from "../components/Trade";
 
 const Trade = () => {
     
