@@ -1,18 +1,27 @@
+import { useState } from "react";
 import AvatarStack from "../components/AvatarStack"
 import Menu from "../components/Menu"
 
 const Trade = () => {
+    
+    const [givingFilters, setGivingFilters] = useState(["secret", "bitcoin", "ethereum", "", ""]);
+    const [recevingFilters, setRecevingFilters] = useState(["secret", "bitcoin", "ethereum"]);
+
+    const clearFilters = () => {
+        setGivingFilters([]);
+        setRecevingFilters([]);
+    }
+
     return (
         <div className="flex flex-col min-h-screen w-screen items-center">
             
+            {/* Title */}
             <div className="w-[75vw] lg:w-[50vw]">
                 <div className="flex flex-col pt-10 pb-5 top-animation">
                     <p className="text-neutral-400 font-bold">Browse Global Contracts</p>
                     <p className="text-white inter" style={{"fontSize": "30px"}}>✨ Trade</p>
                 </div>
             </div>
-            
-
 
 
             <div className="bottom-animation w-[75vw] lg:w-[50vw]">
@@ -32,23 +41,52 @@ const Trade = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="flex mt-5 gap-1 items-center lg:gap-3">
-                    <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
-                    <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
+                <div className="flex mt-5 gap-8">
 
-                    <div className="hidden lg:flex mx-1 h-5 w-[1px] bg-black/10 bg-white/20 md:mx-2"></div>
-
-                    <div className="hidden lg:flex items-center gap-2">
-                        <p className="text-neutral-400 text-xs geist">Giving</p>
-                        <AvatarStack coins={["secret", "bitcoin"]}/>
+                    {/* Dropdowns */}
+                    <div className="flex gap-1 lg:gap-3">
+                        <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">Give <i className="pl-2 bi bi-chevron-down"></i></button>
+                        <button className="bg-neutral-800 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold" >Receive <i className="pl-2 bi bi-chevron-down"></i></button>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-2 ml-2">
-                        <p className="text-neutral-400 text-xs geist">Receiving</p>
-                        <AvatarStack coins={["secret", "bitcoin", "ethereum", ""]}/>
-                    </div>
+                        {/* Filter Display */}
+                        <div className="flex gap-5">
 
-                    <p className="hidden lg:flex inline-block h-8 w-8 rounded-full ring-1 ring-neutral-700 bg-neutral-900 text-white flex justify-center items-center"><i className="bi bi-x-lg"></i></p>
+
+                            {/* Giving */}
+                            {givingFilters.length > 0 &&
+                                <>
+                                    <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
+
+                                    <div className="hidden lg:flex items-center gap-2">
+                                        <p className="text-gray-100 text-xs geist">Giving</p>
+                                        <AvatarStack coins={givingFilters}/>
+                                    </div>
+                                </>
+                            }
+
+
+                            {/* Receiving */}
+                            {recevingFilters.length > 0 &&
+                                <>
+                                    <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
+
+                                    <div className="hidden lg:flex items-center gap-2">
+                                        <p className="text-gray-100 text-xs geist">Receiving</p>
+                                        <AvatarStack coins={recevingFilters}/>
+                                    </div>
+                                </>
+                            }
+
+
+                            {/* Clear */}
+                            {(recevingFilters.length > 0 || givingFilters.length > 0) &&
+                                <>
+                                    <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
+                                    <button onClick={() => clearFilters()} className="hidden lg:flex inline-block h-8 w-8 rounded-full mx-1 ring-1 ring-neutral-700 bg-neutral-900 text-white flex justify-center items-center"><i className="bi bi-x-lg"></i></button>
+                                </>
+                            }
+                        </div>
                 </div>
 
 
@@ -64,9 +102,6 @@ const Trade = () => {
             <Menu page='trade'/>
 
         </div>
-
-        
-            
     )
 }
 

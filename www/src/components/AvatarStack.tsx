@@ -18,7 +18,7 @@ const AvatarStack = (props: AvatarStackProps) => {
       <>
         <div className="flex -space-x-2">
           {displayCoins()}
-          {props.coins.length > 3 && <p className="inline-block h-8 w-8 text-xs rounded-full bg-gray-400 text-white flex justify-center items-center">+{props.coins.length - 3}</p>}
+          {props.coins.length > 3 && <p className="inline-block h-8 w-8 text-xs rounded-full bg-white text-violet-700 flex justify-center items-center">+{props.coins.length - 3}</p>}
         </div>
       </>
     )
