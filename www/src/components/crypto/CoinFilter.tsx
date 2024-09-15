@@ -24,12 +24,6 @@ const coins = [
     name: "bitcoin",
     avatar: 'images/bitcoin.png',
   },
-  {
-    id: 4,
-    abr: 'SHD',
-    name: "shade",
-    avatar: 'images/shade.png',
-  },
 ]
 
 type CoinFilterProps = {

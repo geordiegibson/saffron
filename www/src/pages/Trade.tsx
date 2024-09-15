@@ -64,10 +64,11 @@ const Trade = () => {
                     
                     <CreateContractModel button={<button className="bg-zinc-900 font-bold px-3 rounded"><i className="text-white font-bold bi bi-plus-lg"></i></button>}/>
                 </div>
-
+                
                 <NoResults icon={<i className="bi bi-bank"></i>} title="No Contracts" description="Get started by creating a new contract."/>
            
             </div>
+
 
 
             <Menu page="trade" />
