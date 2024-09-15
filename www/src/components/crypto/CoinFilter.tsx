@@ -1,6 +1,8 @@
 'use client'
 
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import { Dispatch, SetStateAction } from 'react'
+import { Filters } from '../../pages/Trade'
 
 const coins = [
   {
@@ -29,35 +31,49 @@ const coins = [
   },
 ]
 
-const CoinFilter = (props: any) => {
+type CoinFilterProps = {
+  name: string,
+  filter: Array<string>,
+  updateFilter: Dispatch<SetStateAction<Filters>>
+}
 
-  const handleSelect = (coinName: string) => {
-    if (props.filter.includes(coinName)) {
-      props.updateFilter(props.filter.filter((id: any) => id !== coinName))
-    } else {
-      props.updateFilter([...props.filter, coinName])
-    }
-  }
+const CoinFilter = (props: CoinFilterProps) => {
+
+    const filter = props.name === 'Give' ? 'giving' : 'receiving'
+
+    const handleSelect = (coinName: string) => {
+      if (props.filter.includes(coinName)) {
+        props.updateFilter((prevState: Filters) => ({
+          ...prevState,
+          [filter]: props.filter.filter((id: string) => id !== coinName),
+        }));
+      } else {
+        props.updateFilter((prevState: Filters) => ({
+          ...prevState,
+          [filter]: [...props.filter, coinName],
+        }));
+      }
+    };
 
   const isSelected = (coinName: string) => props.filter.includes(coinName)
 
   return (
     <Listbox value={props.filter} onChange={() => handleSelect} multiple>
-      <div className="relative mr-1">
-        <ListboxButton>
-          <button className="bg-zinc-900 text-white text-sm xs:text-sm text-gray-800 flex items-center rounded py-4 px-3 h-6 font-bold">{props.name} <i className="pl-2 bi bi-chevron-down"></i></button>
+      <div className="relative mr-1 w-full">
+        <ListboxButton className="w-full">
+          <button className="w-full flex justify-between border border-zinc-800 rounded-lg text-white text-sm xs:text-sm text-gray-800 flex items-center py-5 px-3 h-6 font-bold">{props.name} <i className="ml-2 bi bi-chevron-expand"></i></button>
         </ListboxButton>
 
         <ListboxOptions
           transition
-          className="absolute bg-zinc-800 w-28 z-10 mt-1 max-h-56 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          className="absolute bg-zinc-800 w-full z-10 mt-1 max-h-56 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
         >
           {coins.map((coin) => (
             <ListboxOption
               key={coin.id}
               value={coin.id}
               onClick={() => handleSelect(coin.name)}
-              className={`group w-full hover:bg-indigo-500 relative cursor-default select-none py-2 flex justify-center text-gray-900 ${
+              className={`group w-full hover:bg-indigo-500 relative cursor-default select-none p-3 px-4 flex text-gray-900 ${
                 isSelected(coin.name) ? 'bg-indigo-600 text-white' : 'text-white'
               }`}
             >

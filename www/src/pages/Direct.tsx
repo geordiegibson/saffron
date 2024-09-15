@@ -2,9 +2,11 @@ import { useState } from "react";
 import AvatarStack from "../components/AvatarStack";
 import Menu from "../components/Menu";
 import CreateContractModel from "../components/CreateContractModel";
-import CoinFilter from "../components/crypto/CoinFilter";
+import Title from "../components/common/Title";
+import NoResults from "../components/common/NoResults";
 
 const Direct = () => {
+
     const [givingFilters, setGivingFilters] = useState([]);
     const [recevingFilters, setRecevingFilters] = useState([]);
 
@@ -14,15 +16,10 @@ const Direct = () => {
     };
 
     return (
+
         <div className="flex flex-col h-screen w-screen items-center">
 
-            {/* Title */}
-            <div className="w-[75vw] lg:w-[50vw]">
-                <div className="flex flex-col pt-10 pb-5 top-animation">
-                    <p className="text-neutral-400 font-bold">Send Direcly</p>
-                    <p className="text-white inter" style={{ fontSize: "30px" }}>🚀 Direct</p>
-                </div>
-            </div>
+            <Title title="🚀 Direct" description="Send Direcly" />
 
             {/* Main content */}
             <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw]">
@@ -39,10 +36,6 @@ const Direct = () => {
                 </div>
 
                 <div className="flex mt-5 gap-8">
-                    <div className="flex gap-1 lg:gap-3">
-                        <CoinFilter name="Give" filter={givingFilters} updateFilter={setGivingFilters} />
-                        <CoinFilter name="Receive" filter={recevingFilters} updateFilter={setRecevingFilters} />
-                    </div>
 
                     <div className="flex gap-5">
                         {givingFilters.length > 0 && (
@@ -76,17 +69,8 @@ const Direct = () => {
                     </div>
                 </div>
 
-                {/* No Contracts Section */}
-                <div className="flex-grow flex flex-col items-center justify-center mb-32">
-                    <p className="text-gray-400 text-3xl mb-2"><i className="bi bi-people-fill"></i></p>
-                    <p className="text-white geist">No Bitches?</p>
-                    <p className="text-gray-400">Get started by organising a direct trade.</p>
-                    <CreateContractModel 
-                        button={<button className="bg-black text-white font-bold rounded text-sm px-2 py-1 mt-3">
-                            <i className="text-white bi bi-plus-lg"></i> New Contract
-                        </button>} 
-                    />
-                </div>
+                <NoResults icon={<i className="bi bi-people-fill"></i>} title="No Bitches?" description="Get started by organising a direct trade." />
+            
             </div>
 
             <Menu page="direct" />
