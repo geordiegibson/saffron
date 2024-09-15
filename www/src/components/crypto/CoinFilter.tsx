@@ -3,6 +3,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
 import { Filters } from '../../pages/Trade'
+import AvatarStack from '../AvatarStack'
 
 const coins = [
   {
@@ -61,7 +62,16 @@ const CoinFilter = (props: CoinFilterProps) => {
     <Listbox value={props.filter} onChange={() => handleSelect} multiple>
       <div className="relative mr-1 w-full">
         <ListboxButton className="w-full">
-          <button className="w-full flex justify-between border border-zinc-800 rounded-lg text-white text-sm xs:text-sm text-gray-800 flex items-center py-5 px-3 h-6 font-bold">{props.name} <i className="ml-2 bi bi-chevron-expand"></i></button>
+          <button className="w-full flex justify-between bg-zinc-800 rounded-lg text-white text-sm xs:text-sm text-gray-800 flex items-center py-5 px-3 h-6 font-bold">
+            
+            {props.name} 
+
+            <div className='flex gap-3 items-center'>
+              <AvatarStack coins={props.filter} /> 
+              <i className="ml-2 bi bi-chevron-expand"></i>
+            </div>
+            
+          </button>
         </ListboxButton>
 
         <ListboxOptions

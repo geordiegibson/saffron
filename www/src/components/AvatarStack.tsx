@@ -1,15 +1,15 @@
 type AvatarStackProps = {
-    coins: Array<String>
+    coins: Array<string>
 }
 
 const AvatarStack = (props: AvatarStackProps) => {
 
     const displayCoins = () => {
-      return props.coins.slice(0, 3).map((coin) => (
+      return props.coins.map((coin) => (
         <img
             alt=""
             src={`images/${coin}.png`}
-            className="inline-block h-8 w-8 rounded-full  ring-white"
+            className="inline-block h-6 w-6 rounded-full  ring-white"
           />
        )) 
     }
@@ -18,7 +18,6 @@ const AvatarStack = (props: AvatarStackProps) => {
       <>
         <div className="flex -space-x-2">
           {displayCoins()}
-          {props.coins.length > 3 && <p className="inline-block h-8 w-8 text-xs rounded-full bg-white text-violet-700 flex justify-center items-center">+{props.coins.length - 3}</p>}
         </div>
       </>
     )
