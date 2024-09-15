@@ -50,14 +50,14 @@ const CoinFilter = (props: any) => {
 
         <ListboxOptions
           transition
-          className="absolute bg-zinc-800 w-24 z-10 mt-1 max-h-56 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          className="absolute bg-zinc-800 w-28 z-10 mt-1 max-h-56 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
         >
           {coins.map((coin) => (
             <ListboxOption
               key={coin.id}
               value={coin.id}
               onClick={() => handleSelect(coin.name)}
-              className={`group w-full relative cursor-default select-none py-2 flex justify-center w-full text-gray-900 ${
+              className={`group w-full hover:bg-indigo-500 relative cursor-default select-none py-2 flex justify-center text-gray-900 ${
                 isSelected(coin.name) ? 'bg-indigo-600 text-white' : 'text-white'
               }`}
             >

@@ -3,10 +3,10 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
 
-const CreateContractModel = () => (
+const CreateContractModel = (props: any) => (
   <Dialog.Root>
     <Dialog.Trigger asChild>
-        <button className="bg-white rounded p-3"><i className="text-black bi bi-plus-lg"></i></button>
+        {props.button}
     </Dialog.Trigger>
     <Dialog.Portal>
       <Dialog.Overlay className="bg-blackA6 data-[state=open]:animate-overlayShow fixed inset-0" />

@@ -49,7 +49,7 @@ const Wallet = () => {
         </div>
 
 
-        <div className="flex flex-col gap-4 p-4 bg-zinc-900 w-[75vw] lg:w-[35vw] h-max rounded-lg mt-6 bottom-animation">
+        <div className="flex flex-col gap-4 p-4 bg-zinc-900 w-[75vw] lg:w-[35vw] h-max rounded-lg mt-5 bottom-animation">
 
             <button onClick={connectKeplrWallet} className="flex justify-between pl-6 pr-4 items-center w-full h-16 rounded-lg bg-zinc-800 hover:bg-zinc-700">
                 <p className="text-white font-bold geist">Keplr</p>
