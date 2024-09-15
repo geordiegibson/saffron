@@ -1,5 +1,4 @@
-import { useState } from "react";
-import AvatarStack from "../components/AvatarStack";
+import { useEffect, useState } from "react";
 import Menu from "../components/Menu";
 import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
@@ -13,17 +12,28 @@ export type Filters = {
 
 const Trade = () => {
 
+    const [filterCount, setFilterCount] = useState(0);
+
     const [filters, setFilters] = useState<Filters>({
         giving: [],
         receiving: []
-    })
+    });
 
-    const clearFilters = () => {
-        setFilters({
-            giving: [],
-            receiving: []
-        });
-    };
+    useEffect(() => {
+        
+        let count = 0;
+
+        if (filters.giving.length > 0) {
+            count += 1
+        }
+
+        if (filters.receiving.length > 0) {
+            count += 1
+        }
+
+        setFilterCount(count)
+
+    }, [filters])
 
     return (
 
@@ -33,6 +43,7 @@ const Trade = () => {
 
             {/* Main content */}
             <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw]">
+
 
                 {/* Search Bar */}
                 <div className="flex w-full gap-2">
@@ -44,52 +55,20 @@ const Trade = () => {
                         <input placeholder="Search" className="w-full rounded-lg pl-10 pr-3 py-3 text-sm bg-neutral-900 border-none placeholder:text-slate-400 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 text-white placeholder:text-slate-600"/>
                     </div>
 
+                    {filterCount > 0 && <div style={{top: "-5px"}} className="absolute right-11 z-10 flex items-center justify-center h-5 w-5 text-white text-xs font-bold bg-red-600 rounded-full">
+                        {filterCount}
+                    </div>}
+
                     <FilterMenu filters={filters} updateFilters={setFilters} button={<button className="bg-zinc-900 px-3 h-full font-bold rounded"><i className="text-white bi bi-funnel"></i></button>}/>
+                    
+                    
                     <CreateContractModel button={<button className="bg-zinc-900 font-bold px-3 rounded"><i className="text-white font-bold bi bi-plus-lg"></i></button>}/>
                 </div>
 
-                {/* Filter Dropdowns */}
-                <div className="flex mt-3 ml-3 gap-8">
-
-                    <div className="flex gap-5">
-
-                        {/* Giving Filter Display */}
-                        {filters.giving.length > 0 && (
-                            <>
-                                <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
-                                <div className="hidden lg:flex items-center gap-2">
-                                    <p className="text-gray-100 text-xs geist">Giving</p>
-                                    <AvatarStack coins={filters.giving} />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Receiving Filter Display */}
-                        {filters.receiving.length > 0 && (
-                            <>
-                                <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
-                                <div className="hidden lg:flex items-center gap-2">
-                                    <p className="text-gray-100 text-xs geist">Receiving</p>
-                                    <AvatarStack coins={filters.receiving} />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Clear Filter Button */}
-                        {(filters.giving.length > 0 || filters.receiving.length > 0) && (
-                            <>
-                                <div className="hidden lg:flex mt-2 h-5 w-[1px] bg-black/10 bg-white/20"></div>
-                                <button onClick={() => clearFilters()} className="hidden lg:flex inline-block h-8 w-8 rounded-full mx-1 ring-1 ring-neutral-700 bg-neutral-900 text-white flex justify-center items-center">
-                                    <i className="bi bi-x-lg"></i>
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-
                 <NoResults icon={<i className="bi bi-bank"></i>} title="No Contracts" description="Get started by creating a new contract."/>
-
+           
             </div>
+
 
             <Menu page="trade" />
 
