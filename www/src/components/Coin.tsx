@@ -1,17 +1,23 @@
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import { Mesh, Group } from 'three';
-import {useRef, useEffect, useState, FC} from "react";
+import { useRef, useEffect, useState, FC } from "react";
 
 interface GLTFResult {
     scene: Group;
 }
 
-const CoinModel: FC = () => {
-    const coinRef = useRef<Mesh | null>(null);
-    const { scene } = useGLTF('models/coin.glb') as GLTFResult;
+interface CoinModelProps {
+    modelUrl: string;
+    scale: number;
+    position: [number, number, number];
+    xRotationAmount: number;
+    yRotationAmount: number;
+}
 
-    scene.rotation.z = Math.PI;
+const CoinModel: FC<CoinModelProps> = ({ modelUrl, scale, position, xRotationAmount, yRotationAmount }) => {
+    const coinRef = useRef<Mesh | null>(null);
+    const { scene } = useGLTF(modelUrl) as GLTFResult;
 
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -29,27 +35,40 @@ const CoinModel: FC = () => {
         };
     }, []);
 
-
-
     useFrame(() => {
         if (coinRef.current) {
-            coinRef.current.rotation.y = Math.PI + mousePos.x * 0.5;
-            coinRef.current.rotation.x = -mousePos.y * 0.2;
+            coinRef.current.rotation.y = Math.PI + mousePos.x * yRotationAmount;
+            coinRef.current.rotation.x = -mousePos.y * xRotationAmount;
         }
     });
 
-    return <primitive object={scene} ref={coinRef} scale={1.5} />; // Slightly smaller scale
+    return (
+        <primitive
+            object={scene}
+            ref={coinRef}
+            scale={scale}
+            position={position}
+        />
+    );
 };
 
 const CoinScene: FC = () => {
     return (
         <div className='fixed inset-0 pointer-events-none'>
-            <Canvas camera={{position: [0, 0, 5], fov: 90}}>
+            <Canvas camera={{ position: [0, 0, 5], fov: 90 }}>
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[5, 5, 5]} />
-                <CoinModel />
-                {/* Optional: Controls for debugging and fine-tuning */}
-                <OrbitControls enablePan={false} enableZoom={false}/>
+
+                {/* Scrt Coin */}
+                <CoinModel modelUrl="models/scrt.glb" scale={1.5} position={[0, 0, 0]} xRotationAmount={0.3} yRotationAmount={0.3} />
+
+                {/* Bitcoin Coin */}
+                <CoinModel modelUrl="models/bitcoin.glb" scale={1} position={[-2.7, -0.5, 0]} xRotationAmount={0.5} yRotationAmount={0.5} />
+
+                {/* Ethereum Coin */}
+                <CoinModel modelUrl="models/ethereum.glb" scale={1} position={[2.7, -0.5, 0]} xRotationAmount={0.5} yRotationAmount={0.5} />
+
+                <OrbitControls enablePan={false} enableZoom={false} />
             </Canvas>
         </div>
     );
