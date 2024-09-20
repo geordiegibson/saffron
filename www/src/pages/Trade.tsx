@@ -4,6 +4,7 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
+import { SecretNetworkClient, Wallet } from "secretjs";
 
 export type Filters = {
     giving: Array<string>
@@ -11,6 +12,8 @@ export type Filters = {
 }
 
 const Trade = () => {
+
+    const [count, setCount] = useState(0);
 
     const [filterCount, setFilterCount] = useState(0);
 
@@ -34,6 +37,25 @@ const Trade = () => {
         setFilterCount(count)
 
     }, [filters])
+
+    const wallet = new Wallet(import.meta.env.VITE_mnemonic);
+
+    const secretjs = new SecretNetworkClient({
+        chainId: "secretdev-1",
+        url: "http://localhost:1317",
+        wallet: wallet,
+        walletAddress: wallet.address,
+      });
+
+    let try_query_count = async () => {
+        const my_query: {count: number} = await secretjs.query.compute.queryContract({
+          contract_address: import.meta.env.VITE_contractAddress as string,
+          code_hash: import.meta.env.VITE_contractCodeHash,
+          query: { get_count: {} },
+        });
+      
+        setCount(my_query.count);
+          };
 
     return (
 
@@ -65,6 +87,9 @@ const Trade = () => {
                     <CreateContractModel button={<button className="bg-zinc-900 font-bold px-3 rounded"><i className="text-white font-bold bi bi-plus-lg"></i></button>}/>
                 </div>
                 
+                <button onClick={() => try_query_count()} className="bg-white rounded p-3">Get Count</button>
+                <p className="text-white">{count}</p>
+
                 <NoResults icon={<i className="bi bi-bank"></i>} title="No Contracts" description="Get started by creating a new contract."/>
            
             </div>
