@@ -55,7 +55,26 @@ const Trade = () => {
         });
       
         setCount(my_query.count);
-          };
+    };
+
+    let try_increment_count = async () => {
+        
+        await secretjs.tx.compute.executeContract(
+          {
+            sender: wallet.address,
+            contract_address: import.meta.env.VITE_contractAddress,
+            code_hash: import.meta.env.VITE_contractCodeHash,
+            msg: {
+              increment: {},
+            },
+            sent_funds: [],
+          },
+          {
+            gasLimit: 100_000,
+          }
+        );
+        console.log("incrementing...");
+      };
 
     return (
 
@@ -88,6 +107,9 @@ const Trade = () => {
                 </div>
                 
                 <button onClick={() => try_query_count()} className="bg-white rounded p-3">Get Count</button>
+
+                <button onClick={() => try_increment_count()} className="bg-white rounded p-3">Add to Count</button>
+
                 <p className="text-white">{count}</p>
 
                 <NoResults icon={<i className="bi bi-bank"></i>} title="No Contracts" description="Get started by creating a new contract."/>
