@@ -1,12 +1,5 @@
 import { SecretNetworkClient, Wallet } from "secretjs";
 
-type Contract = {
-    giving_coin: string,
-    giving_amount: number,
-    receiving_coin: string,
-    receiving_amount: number
-}
-
 const wallet = new Wallet(import.meta.env.VITE_mnemonic);
 
 const secretjs = new SecretNetworkClient({

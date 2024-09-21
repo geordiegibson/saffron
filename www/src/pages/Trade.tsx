@@ -6,18 +6,6 @@ import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
 import {try_query_contracts} from '../secretClient'
 import TradeItem from "../components/TradeItem";
-
-export type Filters = {
-    giving: Array<string>
-    receiving: Array<string>
-}
-
-type Contract = {
-    giving_coin: string,
-    giving_amount: number,
-    receiving_coin: string,
-    receiving_amount: number
-}
  
 const Trade = () => {
 
@@ -82,7 +70,7 @@ const Trade = () => {
                 
 
                 {contracts.length > 0 ?
-                    <div className="flex">
+                    <div className="grid grid-cols-3 gap-4">
                         {contractDisplays()}
                     </div>
                 :
@@ -90,7 +78,7 @@ const Trade = () => {
                 }
 
             </div>
-            
+
             <Menu page="trade" />
 
         </div>
