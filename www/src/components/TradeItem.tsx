@@ -1,4 +1,11 @@
-const TradeItem = () => {
+type Contract = {
+    giving_coin: string,
+    giving_amount: number,
+    receiving_coin: string,
+    receiving_amount: number
+}
+
+const TradeItem = (props: {contract: Contract}) => {
 
     return (
         <div className="h-max w-56 bg-neutral-900 rounded-lg mt-5 p-5 ml-5 flex justify-center">
@@ -9,8 +16,8 @@ const TradeItem = () => {
                     <div className="flex gap-6 items-center">
                         <img className="h-12" src="images/secret.png"/>
                         <div className="flex flex-col">
-                            <p className="text-white font-bold">100</p>
-                            <p className="text-neutral-400">SCRT</p>
+                            <p className="text-white font-bold">{props.contract.giving_amount}</p>
+                            <p className="text-neutral-400">{props.contract.giving_coin}</p>
                         </div>
                     </div>
 
@@ -18,8 +25,8 @@ const TradeItem = () => {
 
                     <div className="flex gap-6 items-center">
                         <div className="flex flex-col">
-                            <p className="text-white font-bold">0.0003</p>
-                            <p className="text-neutral-400">ETH</p>
+                            <p className="text-white font-bold">{props.contract.receiving_amount}</p>
+                            <p className="text-neutral-400">{props.contract.receiving_coin}</p>
                         </div>
                         <img className="h-12" src="images/ethereum.png"/>
                     </div>

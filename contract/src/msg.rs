@@ -12,7 +12,7 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     Increment {},
     Reset { count: i32 },
-    AddContract { giving_coin: String, giving_amount: i32}
+    AddContract { giving_coin: String, giving_amount: i32, receiving_coin: String, receiving_amount: i32}
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]

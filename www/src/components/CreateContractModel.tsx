@@ -2,9 +2,19 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
+import {try_create_contract} from '../secretClient'
 
-const CreateContractModel = (props: any) => (
-  <Dialog.Root>
+const CreateContractModel = (props: any) => {
+
+  let contract: any = {
+    giving_coin: "SCRT",
+    giving_amount: 500,
+    receiving_coin: "BTC",
+    receiving_amount: 13
+  }
+
+  return (
+    <Dialog.Root>
     <Dialog.Trigger asChild>
         {props.button}
     </Dialog.Trigger>
@@ -32,7 +42,7 @@ const CreateContractModel = (props: any) => (
 
         <div className="mt-[25px] flex justify-end">
           <Dialog.Close asChild>
-            <button className="bg-white text-black text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+            <button onClick={() => try_create_contract(contract)} className="bg-white text-black text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
               Create
             </button>
           </Dialog.Close>
@@ -50,6 +60,8 @@ const CreateContractModel = (props: any) => (
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>
-);
+  )
+  
+};
 
 export default CreateContractModel;

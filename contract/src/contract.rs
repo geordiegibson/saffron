@@ -30,7 +30,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     match msg {
         ExecuteMsg::Increment {} => try_increment(deps, env),
         ExecuteMsg::Reset { count } => try_reset(deps, info, count),
-        ExecuteMsg::AddContract { giving_coin, giving_amount } => try_add_contract(deps, info, giving_coin, giving_amount)
+        ExecuteMsg::AddContract { giving_coin, giving_amount , receiving_coin, receiving_amount} => try_add_contract(deps, info, giving_coin, giving_amount, receiving_coin, receiving_amount)
     }
 }
 
@@ -59,7 +59,7 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> StdResult<Resp
 }
 
 // User creates a new trade request
-pub fn try_add_contract(deps: DepsMut, info: MessageInfo, giving_coin: String, giving_amount: i32) -> StdResult<Response> {
+pub fn try_add_contract(deps: DepsMut, info: MessageInfo, giving_coin: String, giving_amount: i32, receiving_coin: String, receiving_amount: i32) -> StdResult<Response> {
 
     let sender_address = info.sender.clone();
     config(deps.storage).update(|mut state| {
@@ -69,7 +69,10 @@ pub fn try_add_contract(deps: DepsMut, info: MessageInfo, giving_coin: String, g
 
         let contract = Contract {
             giving_coin,
-            giving_amount
+            giving_amount,
+            receiving_coin,
+            receiving_amount,
+            expiration: String::new()
         };
 
         state.contracts.push(contract);
