@@ -3,15 +3,26 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
 import {try_create_contract} from '../secretClient'
+import { useState } from 'react';
 
 const CreateContractModel = (props: any) => {
+  const initialCoin = { id: 1, name: 'SCRT', avatar: 'images/secret.png' };
+  // State for the form inputs
+  const [givingCoin, setGivingCoin] = useState(initialCoin);
+  const [givingAmount, setGivingAmount] = useState(500);
+  const [receivingCoin, setReceivingCoin] = useState(initialCoin);
+  const [receivingAmount, setReceivingAmount] = useState(13);
 
-  let contract: any = {
-    giving_coin: "SCRT",
-    giving_amount: 500,
-    receiving_coin: "BTC",
-    receiving_amount: 13
-  }
+  // Function to handle contract creation
+  const handleCreateContract = () => {
+    const contract = {
+      giving_coin: givingCoin.name,
+      giving_amount: givingAmount,
+      receiving_coin: receivingCoin.name,
+      receiving_amount: receivingAmount
+    };
+    try_create_contract(contract);
+  };
 
   return (
     <Dialog.Root>
@@ -27,12 +38,22 @@ const CreateContractModel = (props: any) => {
 
         <div className="mb-[15px] flex flex-col gap-1 mt-5">
           <label className="text-gray-400 w-[90px] text-left w-full text-xs" htmlFor="name">You Give</label>
-          <CryptoInput />
+          <CryptoInput
+              selectedCoin={givingCoin}
+              onCoinChange={setGivingCoin}
+              amount={givingAmount}
+              onAmountChange={setGivingAmount}
+            />
         </div>
 
         <div className="mb-[15px] flex flex-col gap-1">
           <label className="text-gray-400 w-[90px] text-left w-full text-xs" htmlFor="name">You Receive</label>
-          <CryptoInput />
+          <CryptoInput
+              selectedCoin={receivingCoin}
+              onCoinChange={setReceivingCoin}
+              amount={receivingAmount}
+              onAmountChange={setReceivingAmount}
+            />
         </div>
 
         <div className="mb-[15px] flex flex-col gap-1">
@@ -42,7 +63,7 @@ const CreateContractModel = (props: any) => {
 
         <div className="mt-[25px] flex justify-end">
           <Dialog.Close asChild>
-            <button onClick={() => try_create_contract(contract)} className="bg-white text-black text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+            <button onClick={handleCreateContract} className="bg-white text-black text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
               Create
             </button>
           </Dialog.Close>

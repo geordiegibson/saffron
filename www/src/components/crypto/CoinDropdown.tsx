@@ -1,6 +1,4 @@
 'use client'
-
-import { useState } from 'react'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 
 const coins = [
@@ -27,25 +25,28 @@ const coins = [
   
 ]
 
-const CoinDropdown = () => {
-  const [selected, setSelected] = useState(coins[0])
+interface CoinDropdownProps {
+  selectedCoin: { id: number, name: string, avatar: string };
+  onChange: (coin: { id: number, name: string, avatar: string }) => void;
+}
 
+const CoinDropdown = ({ selectedCoin, onChange }: CoinDropdownProps) => {
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selectedCoin} onChange={onChange}>
       <div className="relative mr-1">
         <ListboxButton className="relative w-full cursor-default rounded-md py-1 bg-neutral-800 pl-3 mr-8 text-left text-white sm:text-sm sm:leading-6">
           <span className="flex items-center">
-            <img alt="" src={selected.avatar} className="h-5 w-5 flex-shrink-0 rounded-full" />
-            <span className="ml-3 block truncate">{selected.name}</span>
+            <img alt="" src={selectedCoin.avatar} className="h-5 w-5 flex-shrink-0 rounded-full" />
+            <span className="ml-3 block truncate">{selectedCoin.name}</span>
           </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-          <i className="bi bi-chevron-down"></i>
+            <i className="bi bi-chevron-down"></i>
           </span>
         </ListboxButton>
 
         <ListboxOptions
           transition
-          className="absolute bg-zinc-800 z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none data-[closed]:data-[leave]:opacity-0 data-[leave]:transition data-[leave]:duration-100 data-[leave]:ease-in sm:text-sm"
+          className="absolute bg-zinc-800 z-10 mt-1 max-h-56 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           {coins.map((coin) => (
             <ListboxOption
