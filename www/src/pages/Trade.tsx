@@ -11,10 +11,15 @@ export type Filters = {
     receiving: Array<string>
 }
 
+type Contract = {
+    giving_coin: string,
+    giving_amount: number
+}
+
 const Trade = () => {
 
     const [count, setCount] = useState(0);
-
+    const [contracts, setContracts] = useState<Array<Contract>>([])
     const [filterCount, setFilterCount] = useState(0);
 
     const [filters, setFilters] = useState<Filters>({
@@ -57,6 +62,21 @@ const Trade = () => {
         setCount(my_query.count);
     };
 
+    let try_query_contracts = async () => {
+
+        console.log("getting contracts")
+
+        const my_query: {contracts: Array<Contract>} = await secretjs.query.compute.queryContract({
+          contract_address: import.meta.env.VITE_contractAddress as string,
+          code_hash: import.meta.env.VITE_contractCodeHash,
+          query: { get_contracts: {} },
+        });
+      
+        console.log(my_query.contracts)
+
+        setContracts(my_query.contracts);
+    };
+
     let try_increment_count = async () => {
         
         await secretjs.tx.compute.executeContract(
@@ -74,6 +94,28 @@ const Trade = () => {
           }
         );
         console.log("incrementing...");
+      };
+
+
+      let try_create_contract = async () => {
+        
+        console.log("creating contract...");
+
+        await secretjs.tx.compute.executeContract(
+          {
+            sender: wallet.address,
+            contract_address: import.meta.env.VITE_contractAddress,
+            code_hash: import.meta.env.VITE_contractCodeHash,
+            msg: {
+              add_contract: {giving_coin: "Secret", giving_amount: 999},
+            },
+            sent_funds: [],
+          },
+          {
+            gasLimit: 100_000,
+          }
+        );
+        console.log("created!");
       };
 
     return (
@@ -110,7 +152,13 @@ const Trade = () => {
 
                 <button onClick={() => try_increment_count()} className="bg-white rounded p-3">Add to Count</button>
 
+                <button onClick={() => try_query_contracts()} className="bg-white rounded p-3">Get Contracts</button>
+
+                <button onClick={() => try_create_contract()} className="bg-white rounded p-3">Create Contract</button>
+
                 <p className="text-white">{count}</p>
+
+                <p className="text-white">{contracts.toString()}</p>
 
                 <NoResults icon={<i className="bi bi-bank"></i>} title="No Contracts" description="Get started by creating a new contract."/>
            

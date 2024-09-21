@@ -2,8 +2,8 @@ use cosmwasm_std::{
     entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
 };
 
-use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{config, config_read, State};
+use crate::msg::{ContractsResponse, CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::state::{config, config_read, State, Contract};
 
 #[entry_point]
 pub fn instantiate(
@@ -14,6 +14,7 @@ pub fn instantiate(
 ) -> StdResult<Response> {
     let state = State {
         count: msg.count,
+        contracts: Vec::new(),
         owner: info.sender.clone(),
     };
 
@@ -29,6 +30,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     match msg {
         ExecuteMsg::Increment {} => try_increment(deps, env),
         ExecuteMsg::Reset { count } => try_reset(deps, info, count),
+        ExecuteMsg::AddContract { giving_coin, giving_amount } => try_add_contract(deps, info, giving_coin, giving_amount)
     }
 }
 
@@ -56,16 +58,44 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> StdResult<Resp
     Ok(Response::default())
 }
 
+// User creates a new trade request
+pub fn try_add_contract(deps: DepsMut, info: MessageInfo, giving_coin: String, giving_amount: i32) -> StdResult<Response> {
+
+    let sender_address = info.sender.clone();
+    config(deps.storage).update(|mut state| {
+        if sender_address != state.owner {
+            return Err(StdError::generic_err("Only the owner can reset count"));
+        }
+
+        let contract = Contract {
+            giving_coin,
+            giving_amount
+        };
+
+        state.contracts.push(contract);
+        Ok(state)
+    })?;
+
+    deps.api.debug("count reset successfully");
+    Ok(Response::default())
+}
+
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
+        QueryMsg::GetContracts {} => to_binary(&query_contracts(deps)?),
     }
 }
 
 fn query_count(deps: Deps) -> StdResult<CountResponse> {
     let state = config_read(deps.storage).load()?;
     Ok(CountResponse { count: state.count })
+}
+
+fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
+    let state = config_read(deps.storage).load()?;
+    Ok(ContractsResponse { contracts: state.contracts })
 }
 
 #[cfg(test)]
