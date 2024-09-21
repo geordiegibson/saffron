@@ -6,7 +6,7 @@ import {try_create_contract} from '../secretClient'
 import { useState } from 'react';
 
 const CreateContractModel = (props: any) => {
-  const initialCoin = { id: 1, name: 'SCRT', avatar: 'images/secret.png' };
+  const initialCoin = { id: 1, name: 'SCRT', avatar: 'images/SCRT.png' };
   // State for the form inputs
   const [givingCoin, setGivingCoin] = useState(initialCoin);
   const [givingAmount, setGivingAmount] = useState(500);

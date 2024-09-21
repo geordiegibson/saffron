@@ -13,9 +13,9 @@ const Home = () => {
             <div className="flex flex-col items-center text-center w-full">
 
                 <div className="flex justify-center items-end w-full gap-2 lg:gap-4">
-                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/ethereum.png' />
-                    <img className="h-36 lg:h-max coin coin-primary drop-shadow-darker" src='images/secret.png' />
-                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/bitcoin.png' />
+                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/ETH.png' />
+                    <img className="h-36 lg:h-max coin coin-primary drop-shadow-darker" src='images/SCRT.png' />
+                    <img className='h-24 lg:h-36 coin coin-secondary drop-shadow-darker' src='images/BTC.png' />
                 </div>
 
                 <div className="animate text-animation flex flex-grow flex-col items-center text-center ">
