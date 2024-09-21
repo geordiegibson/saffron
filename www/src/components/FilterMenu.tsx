@@ -1,6 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import CoinFilter from './crypto/CoinFilter'
-import { Filters } from '../pages/Trade'
 import { Dispatch, ReactElement, SetStateAction } from 'react'
 
 type FilterMenuProps = {

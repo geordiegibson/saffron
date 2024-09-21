@@ -2,7 +2,6 @@
 
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
-import { Filters } from '../../pages/Trade'
 import AvatarStack from '../AvatarStack'
 
 const coins = [
