@@ -5,22 +5,22 @@ const coins = [
   {
     id: 1,
     name: 'SCRT',
-    avatar: 'images/secret.png',
+    avatar: 'images/SCRT.png',
   },
   {
     id: 2,
     name: 'ETH',
-    avatar: 'images/ethereum.png',
+    avatar: 'images/ETH.png',
   },
   {
     id: 3,
     name: 'BTC',
-    avatar: 'images/bitcoin.png',
+    avatar: 'images/BTC.png',
   },
   {
     id: 3,
     name: 'SHD',
-    avatar: 'images/shade.svg',
+    avatar: 'images/SHD.png',
   },
   
 ]

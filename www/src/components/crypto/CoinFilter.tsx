@@ -10,19 +10,19 @@ const coins = [
     id: 1,
     abr: 'SCRT',
     name: "secret",
-    avatar: 'images/secret.png',
+    avatar: 'images/SCRT.png',
   },
   {
     id: 2,
     abr: 'ETH',
     name: "ethereum",
-    avatar: 'images/ethereum.png',
+    avatar: 'images/ETH.png',
   },
   {
     id: 3,
     abr: 'BTC',
     name: "bitcoin",
-    avatar: 'images/bitcoin.png',
+    avatar: 'images/BTC.png',
   },
 ]
 

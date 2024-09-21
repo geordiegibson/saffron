@@ -7,7 +7,7 @@ const TradeItem = (props: {contract: Contract}) => {
 
 
                     <div className="flex gap-6 items-center">
-                        <img className="h-12" src="images/secret.png"/>
+                        <img className="h-12" src={`images/${props.contract.giving_coin}.png`} />
                         <div className="flex flex-col">
                             <p className="text-white font-bold">{props.contract.giving_amount}</p>
                             <p className="text-neutral-400">{props.contract.giving_coin}</p>
@@ -21,7 +21,7 @@ const TradeItem = (props: {contract: Contract}) => {
                             <p className="text-white font-bold">{props.contract.receiving_amount}</p>
                             <p className="text-neutral-400">{props.contract.receiving_coin}</p>
                         </div>
-                        <img className="h-12" src="images/ethereum.png"/>
+                        <img className="h-12" src={`images/${props.contract.receiving_coin}.png`} />
                     </div>
 
 
