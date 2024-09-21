@@ -26,7 +26,7 @@ const TradeItem = (props: {contract: Contract}) => {
 
 
                     <div className="flex gap-2 mt-5 justify-center">
-                        <div className="text-red-900 bg-red-300 px-1 py-0.5 w-max rounded text-xs">Sep 13th 17:00 UTC</div>
+                        <div className="text-red-900 bg-red-300 px-1 py-0.5 w-max rounded text-xs">props.contract.expiry</div>
                     </div>
 
                 </div>

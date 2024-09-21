@@ -19,7 +19,8 @@ const CreateContractModel = (props: any) => {
       giving_coin: givingCoin.name,
       giving_amount: givingAmount,
       receiving_coin: receivingCoin.name,
-      receiving_amount: receivingAmount
+      receiving_amount: receivingAmount,
+      expiration: 3,
     };
     try_create_contract(contract);
   };

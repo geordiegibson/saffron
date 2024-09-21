@@ -21,19 +21,31 @@ export let try_query_contracts = async () => {
 };
 
 export let try_create_contract = async (contract: Contract) => {
-    
-    await secretjs.tx.compute.executeContract(
-        {
-        sender: wallet.address,
-        contract_address: import.meta.env.VITE_contractAddress,
-        code_hash: import.meta.env.VITE_contractCodeHash,
-        msg: {
-            add_contract: {giving_coin: contract.giving_coin, giving_amount: contract.giving_amount, receiving_coin: contract.receiving_coin, receiving_amount: contract.receiving_amount},
-        },
-        sent_funds: [],
-        },
-        {
-        gasLimit: 100_000,
-        }
-    );
-    };
+    try {
+        await secretjs.tx.compute.executeContract(
+            {
+                sender: wallet.address,
+                contract_address: import.meta.env.VITE_contractAddress,
+                code_hash: import.meta.env.VITE_contractCodeHash,
+                msg: {
+                    add_contract: {
+                        giving_coin: contract.giving_coin,
+                        giving_amount: contract.giving_amount,
+                        receiving_coin: contract.receiving_coin,
+                        receiving_amount: contract.receiving_amount
+                    },
+                },
+                sent_funds: [],
+            },
+            {
+                gasLimit: 100_000,
+            }
+        );
+        console.log("Contract created successfully.");
+    } catch (error) {
+        console.error("Failed to create contract:", error);
+        // You can handle specific error types or messages here
+        // For example, you could return a specific error response or rethrow the error
+        throw new Error(`Contract creation error: ${error.message}`);
+    }
+};

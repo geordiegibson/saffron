@@ -27,7 +27,6 @@ https://docs.scrt.network/secret-network-documentation/development/readme-1/comp
     npm install
     ```
 ## Running the app
-
   - Running
     ```
     npm run dev
