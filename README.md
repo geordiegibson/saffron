@@ -6,7 +6,7 @@ Tom Barthelmeh
 Geordie Gibson
 Daniel Neal
 
-## How to Run
+## Set Up
 
 - Setup your Secret Network Environment
 https://docs.scrt.network/secret-network-documentation/development/readme-1/setting-up-your-environment
@@ -22,12 +22,12 @@ https://docs.scrt.network/secret-network-documentation/development/readme-1/comp
   VITE_contractAddress="secret1rbj..."
   VITE_contractCodeHash="" # 64 chars of your contract code hash
   ```
-
-- Running the app
-  - Set up
+- Set up npm dependencies
     ```
     npm install
     ```
+## Running the app
+
   - Running
     ```
     npm run dev
