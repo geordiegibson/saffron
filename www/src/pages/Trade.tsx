@@ -9,7 +9,34 @@ import TradeItem from "../components/TradeItem";
  
 const Trade = () => {
 
-    const [contracts, setContracts] = useState<Array<Contract>>([])
+    const defaultContracts: Contract[] = [
+        {
+            giving_coin: 'BTC',
+            giving_amount: 1,
+            receiving_coin: 'SCRT',
+            receiving_amount: 2000
+        },
+        {
+            giving_coin: 'SCRT',
+            giving_amount: 20,
+            receiving_coin: 'SHD',
+            receiving_amount: 40
+        },
+        {
+            giving_coin: 'ETH',
+            giving_amount: 1,
+            receiving_coin: 'BTC',
+            receiving_amount: 0.02
+        },
+        {
+            giving_coin: 'SHD',
+            giving_amount: 5,
+            receiving_coin: 'SCRT',
+            receiving_amount: 10
+        }
+    ]
+
+    const [contracts, setContracts] = useState<Array<Contract>>(defaultContracts)
     const [filterCount, setFilterCount] = useState(0);
 
     const [filters, setFilters] = useState<Filters>({
@@ -55,7 +82,7 @@ const Trade = () => {
                         <svg fill="white" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                             <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
                         </svg>
-                        <input placeholder="Search" className="w-full rounded-lg pl-10 pr-3 py-3 text-sm bg-neutral-900 border-none placeholder:text-slate-400 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 text-white placeholder:text-slate-600"/>
+                        <input placeholder="Search" className="w-full rounded-lg pl-10 pr-3 py-3 text-sm bg-neutral-900 border-none focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 text-white placeholder:text-slate-600"/>
                     </div>
 
                     {filterCount > 0 && <div style={{top: "-5px"}} className="absolute right-11 z-10 flex items-center justify-center h-5 w-5 text-white text-xs font-bold bg-red-600 rounded-full">
@@ -70,7 +97,7 @@ const Trade = () => {
                 
 
                 {contracts.length > 0 ?
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {contractDisplays()}
                     </div>
                 :
