@@ -15,8 +15,8 @@ const TradeItem = (props: {contract: Contract}) => {
             const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
             const seconds = Math.floor((timeDiff / 1000) % 60);
 
-            let timeLeft = "";
-            let urgency = "";
+            let timeLeft: string;
+            let urgency: string;
 
             if (days > 0) {
                 timeLeft = `${days} day${days > 1 ? "s" : ""} left`;
