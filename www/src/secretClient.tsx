@@ -9,7 +9,7 @@ const secretjs = new SecretNetworkClient({
     walletAddress: wallet.address,
 });
 
-export let try_query_contracts = async () => {
+export const try_query_contracts = async () => {
 
     const my_query: {contracts: Array<Contract>} = await secretjs.query.compute.queryContract({
       contract_address: import.meta.env.VITE_contractAddress as string,
@@ -20,7 +20,7 @@ export let try_query_contracts = async () => {
     return my_query.contracts
 };
 
-export let try_create_contract = async (contract: Contract) => {
+export const try_create_contract = async (contract: Contract) => {
     
     await secretjs.tx.compute.executeContract(
         {
