@@ -69,7 +69,7 @@ const Trade = () => {
 
         <div className="flex flex-col h-screen w-screen items-center">
 
-            <Title title="✨ Trade" description="Browse Global Contracts"/>
+            <Title title="Trade" description="Browse Global Contracts"/>
 
             {/* Main content */}
             <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw]">

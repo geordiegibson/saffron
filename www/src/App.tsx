@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Trade from './pages/Trade';
 import Direct from './pages/Direct';
 import Wallet from './pages/Wallet';
+import Chat from './pages/Chat';
 import NotFound from './pages/Error';
 
 function App() {
@@ -17,8 +18,8 @@ function App() {
                     <Route path="/trade" element={<Trade />}/>
                     <Route path="/direct" element={<Direct />}/>
                     <Route path="/wallet" element={<Wallet />}/>
+                    <Route path="/chat" element={<Chat />} />
                     <Route path="*" element={<NotFound />} />
-
                 </Routes>
             </Router>
         </div>

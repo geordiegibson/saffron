@@ -19,7 +19,7 @@ const Direct = () => {
 
         <div className="flex flex-col h-screen w-screen items-center">
 
-            <Title title="🚀 Direct" description="Send Direcly" />
+            <Title title="Direct" description="Send Direcly" />
 
             {/* Main content */}
             <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw]">

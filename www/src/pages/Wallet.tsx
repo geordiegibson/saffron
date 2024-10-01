@@ -44,7 +44,7 @@ const Wallet = () => {
         <div className="w-[75vw] lg:w-[50vw]">
             <div className="flex flex-col pt-10 pb-5 top-animation">
                 <p className="text-neutral-400 font-bold">Select Wallet to Connect</p>
-                <p className="text-white inter" style={{"fontSize": "30px"}}>💵 Wallet</p>
+                <p className="text-white inter" style={{"fontSize": "30px"}}>Wallet</p>
             </div>
         </div>
 
