@@ -3,11 +3,15 @@ import { SecretNetworkClient, Wallet } from "secretjs";
 const wallet = new Wallet(import.meta.env.VITE_mnemonic);
 
 const secretjs = new SecretNetworkClient({
-    chainId: "secretdev-1",
-    url: "http://localhost:1317",
-    wallet: wallet,
-    walletAddress: wallet.address,
+  chainId: "secretdev-1",
+  url: "http://localhost:1317",
+  wallet: wallet,
+  walletAddress: wallet.address,
 });
+
+export const get_personal_address = () => {
+  return wallet.address;
+};
 
 export const try_query_contracts = async () => {
 
@@ -37,10 +41,10 @@ export const try_create_contract = async (contract: Contract) => {
             add_contract: {giving_coin: contract.giving_coin, giving_amount: contract.giving_amount, receiving_coin: contract.receiving_coin, receiving_amount: contract.receiving_amount},
         },
         sent_funds: [],
-        },
-        {
+      },
+      {
         gasLimit: 100_000,
-        }
+      }
     );
 
     console.log("Created contract")
