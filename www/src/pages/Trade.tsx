@@ -20,7 +20,6 @@ const Trade = () => {
   });
 
   const handleClick = () => {
-    {console.log("clicked")}
     {setIsDialogOpen(true)}
   }
 

@@ -57,7 +57,7 @@ const Chat = () => {
       <Title title="Chat" description="Organise a Trade" />
 
       {/* Main content */}
-      <div className="flex flex-col flex-grow w-[75vw] lg:w-[50vw]">
+      <div className="flex flex-col flex-grow w-[75vw] lg:w-[50vw] bottom-animation">
         <div
           ref={chatContainerRef}
           className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-275px)]"

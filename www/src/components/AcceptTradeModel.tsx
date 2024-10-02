@@ -1,31 +1,12 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import CryptoInput from './crypto/CryptoSelect';
-import Dropdown from './common/Dropdown';
-import {try_create_contract} from '../secretClient'
-import { useState } from 'react';
 
 const AcceptTradeModel = (props: any) => {
 
-  const initialCoin = { id: 1, name: 'SCRT', avatar: 'images/SCRT.png' };
-
-  // State for the form inputs
-  const [givingCoin, setGivingCoin] = useState(initialCoin);
-  const [givingAmount, setGivingAmount] = useState(500);
-  const [receivingCoin, setReceivingCoin] = useState(initialCoin);
-  const [receivingAmount, setReceivingAmount] = useState(13);
-
-  // Function to handle contract creation
-  const handleCreateContract = () => {
-    const contract = {
-      giving_coin: givingCoin.name,
-      giving_amount: givingAmount,
-      receiving_coin: receivingCoin.name,
-      receiving_amount: receivingAmount
-    };
-    try_create_contract(contract);
-  };
-
+  const handleAcceptTrade = () => {
+    console.log("Trade Accepted")
+  }
+  
   return (
     <Dialog.Root open={props.isOpen} onOpenChange={props.onClose}>
     <Dialog.Portal>
@@ -37,7 +18,7 @@ const AcceptTradeModel = (props: any) => {
         </Dialog.Title>
         
 
-        <span className="mt-8 w-full gap-8 inline-flex items-center px-6 py-3 text-green-200 bg-green-900/30 border border-green-700 rounded-xl">
+        <span className="mt-8 w-full inline-flex items-center justify-between px-6 py-3 text-green-200 bg-green-900/30 rounded-xl">
           <p className='text-sm'>You Receive:</p>
 
           <div className='flex gap-2 items-center'>
@@ -47,7 +28,7 @@ const AcceptTradeModel = (props: any) => {
          
         </span>
 
-        <span className="mb-3 mt-3 w-full gap-16 inline-flex items-center px-6 py-3 text-red-200 bg-red-900/30 border border-red-700 rounded-xl">
+        <span className="mb-1 mt-3 w-full gap-16 inline-flex  justify-between items-center px-6 py-3 text-red-200 bg-red-900/30 rounded-xl">
           <p className='text-sm'>You Give:</p>
 
           <div className='flex gap-2 items-center'>
@@ -57,10 +38,10 @@ const AcceptTradeModel = (props: any) => {
          
         </span>
 
-        <div className="mt-[25px] flex justify-center">
+        <div className="mt-[25px] flex justify-end">
           <Dialog.Close asChild>
-            <button onClick={handleCreateContract} className="bg-white text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
-              Accept Contract
+            <button onClick={handleAcceptTrade} className="bg-white text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+              Accept
             </button>
           </Dialog.Close>
         </div>
