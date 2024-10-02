@@ -4,21 +4,36 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
-import { try_query_contracts, transfer_snip20, balanceResponse } from "../secretClient";
+import { try_query_contracts } from "../secretClient";
 import TradeItem from "../components/TradeItem";
+import AcceptTradeModel from "../components/AcceptTradeModel";
 
 const Trade = () => {
+
   const [contracts, setContracts] = useState<Array<Contract>>([]);
   const [filterCount, setFilterCount] = useState(0);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>()
   const [filters, setFilters] = useState<Filters>({
     giving: [],
     receiving: [],
   });
 
+  const handleClick = () => {
+    {console.log("clicked")}
+    {setIsDialogOpen(true)}
+  }
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedContract(null);
+  };
+
   const contractDisplays = () => {
     return contracts.map((contract, index) => (
-      <TradeItem key={index} contract={contract} />
+      <div key={index} onClick={() => handleClick()}>
+        <TradeItem contract={contract}/>
+      </div>
     ));
   };
 
@@ -43,6 +58,7 @@ const Trade = () => {
 
       {/* Main content */}
       <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw]">
+        
         {/* Search Bar */}
         <div className="flex w-full gap-2">
           <div className="relative w-full">
@@ -88,13 +104,17 @@ const Trade = () => {
           />
         </div>
 
-        <button className="bg-white p-3 rounded-xl" onClick={() => transfer_snip20(import.meta.env.VITE_contractAddress)}>Transfer Funds to Escrow</button>
-        
-        <button className="bg-white p-3 rounded-xl" onClick={() => console.log(balanceResponse)}>Get Zebra Balance</button>
-
         {contracts.length > 0 ? (
           <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {contractDisplays()}
+            {/* Render AcceptTradeModel and pass props */}
+            {isDialogOpen && (
+              <AcceptTradeModel
+                isOpen={isDialogOpen}
+                onClose={closeDialog}
+                contract={selectedContract}
+              />
+            )}
           </div>
         ) : (
           <NoResults

@@ -73,7 +73,8 @@ export let transfer_snip20 = async (receiver_wallet: string) => {
       gasLimit: 100_000,
     }
   );
-  console.log(tx);
+  console.log(tx)
+  return tx
 };
 
 
@@ -84,7 +85,7 @@ export let balanceResponse: any = await secretjs.query.compute.queryContract({
   query: {
     balance: {
       address: get_personal_address(),
-      key: "<your_viewing_key>"
+      key: "your_viewing_key"
     }
   },
 });

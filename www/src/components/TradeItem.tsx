@@ -38,7 +38,9 @@ const TradeItem = (props: {contract: Contract}) => {
         }
     };
 
+
     const renderTimeLeft = () => {
+
         const urgencyClasses = {
             low: 'text-green-900 bg-green-300',
             medium: 'text-yellow-900 bg-yellow-300',
@@ -58,8 +60,8 @@ const TradeItem = (props: {contract: Contract}) => {
 
     return (
 
-        <div
-            className="h-max bg-neutral-900 rounded-lg mt-5 p-5 flex flex-col justify-center items-center w-full">
+        <div className="h-max bg-neutral-900 rounded-lg mt-5 p-5 flex flex-col justify-center items-center w-full">
+
 
             <div className='flex flex-row justify-between w-full'>
                 <div className='flex-col justify-start items-center'>
@@ -69,6 +71,7 @@ const TradeItem = (props: {contract: Contract}) => {
                 <img className='h-10' src={`images/${props.contract.giving_coin}.png`}
                      alt={props.contract.giving_coin}/>
             </div>
+
 
             <div className='rounded-full bg-white p-2'>
                 <svg className="h-3 rotate-90" fill={'black'} xmlns="http://www.w3.org/2000/svg"
@@ -87,6 +90,7 @@ const TradeItem = (props: {contract: Contract}) => {
                 <img className='h-10' src={`images/${props.contract.receiving_coin}.png`}
                      alt={props.contract.receiving_coin}/>
             </div>
+
 
             <div className='justify-center items-center w-full px-2 mt-4'>
                 {renderTimeLeft()}
