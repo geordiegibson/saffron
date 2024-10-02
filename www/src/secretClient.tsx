@@ -11,17 +11,23 @@ const secretjs = new SecretNetworkClient({
 
 export const try_query_contracts = async () => {
 
+    console.log("Fetching contracts")
+
     const my_query: {contracts: Array<Contract>} = await secretjs.query.compute.queryContract({
       contract_address: import.meta.env.VITE_contractAddress as string,
       code_hash: import.meta.env.VITE_contractCodeHash,
       query: { get_contracts: {} },
     });
     
+    console.log("Fetched contracts", my_query.contracts)
+
     return my_query.contracts
 };
 
 export const try_create_contract = async (contract: Contract) => {
     
+    console.log("Attemping to create contract")
+
     await secretjs.tx.compute.executeContract(
         {
         sender: wallet.address,
@@ -36,4 +42,7 @@ export const try_create_contract = async (contract: Contract) => {
         gasLimit: 100_000,
         }
     );
+
+    console.log("Created contract")
+
     };
