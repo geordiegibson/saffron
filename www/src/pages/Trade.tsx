@@ -4,7 +4,7 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
-import { try_query_contracts } from "../secretClient";
+import { try_query_contracts, transfer_snip20, balanceResponse } from "../secretClient";
 import TradeItem from "../components/TradeItem";
 
 const Trade = () => {
@@ -87,6 +87,10 @@ const Trade = () => {
             }
           />
         </div>
+
+        <button className="bg-white p-3 rounded-xl" onClick={() => transfer_snip20(import.meta.env.VITE_contractAddress)}>Transfer Funds to Escrow</button>
+        
+        <button className="bg-white p-3 rounded-xl" onClick={() => console.log(balanceResponse)}>Get Zebra Balance</button>
 
         {contracts.length > 0 ? (
           <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

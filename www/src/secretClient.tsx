@@ -49,4 +49,42 @@ export const try_create_contract = async (contract: Contract) => {
 
     console.log("Created contract")
 
-    };
+};
+
+  
+// Transfer coins to from the users wallet to the escrow contract
+export let transfer_snip20 = async (receiver_wallet: string) => {
+  let executeMsg = {
+    transfer: {
+      owner: wallet.address,
+      amount: "1",
+      recipient: receiver_wallet,
+    },
+  };
+
+  let tx = await secretjs.tx.compute.executeContract(
+    {
+      sender: wallet.address,
+      contract_address: import.meta.env.VITE_coin_contractAddress as string,
+      code_hash: import.meta.env.VITE_coin_contractCodeHash as string,
+      msg: executeMsg,
+    },
+    {
+      gasLimit: 100_000,
+    }
+  );
+  console.log(tx);
+};
+
+
+// Query the users coin balance for a specific coin. Used for testing locally :)
+export let balanceResponse: any = await secretjs.query.compute.queryContract({
+  contract_address: import.meta.env.VITE_coin_contractAddress as string,
+  code_hash: import.meta.env.VITE_coin_contractCodeHash as string,
+  query: {
+    balance: {
+      address: get_personal_address(),
+      key: "<your_viewing_key>"
+    }
+  },
+});

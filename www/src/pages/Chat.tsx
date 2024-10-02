@@ -3,8 +3,8 @@ import Menu from "../components/Menu";
 import Title from "../components/common/Title";
 import {
   get_personal_address,
-  try_create_message,
-  try_query_all_messages,
+  // try_create_message,
+  // try_query_all_messages,
 } from "../secretClient";
 
 const Chat = () => {
@@ -14,17 +14,17 @@ const Chat = () => {
   ]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setAddr(get_personal_address());
-    try_query_all_messages().then((messages) => {
-      setMessages(messages);
-      console.log(messages);
-    });
-  }, []);
+  // useEffect(() => {
+  //   setAddr(get_personal_address());
+  //   try_query_all_messages().then((messages) => {
+  //     setMessages(messages);
+  //     console.log(messages);
+  //   });
+  // }, []);
 
   const addMessage = (text: string) => {
     let msg = { message: text, sender: addr };
-    try_create_message(msg.message).then(() => setMessages([...messages, msg]));
+    // try_create_message(msg.message).then(() => setMessages([...messages, msg]));
   };
 
   const messageDisplay = () => {
