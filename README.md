@@ -58,3 +58,22 @@ secretcli tx compute instantiate <contract_number> '{"name": "Zebra", "symbol": 
 ```
 
 During this process you will want to store the contract_address and contract_hash :)
+
+Now you shoud have 1,000,000,000 of the coin you just created in your wallet. You can confirm this by querying your balance on the contract.
+
+Before you can do that you need to first create a viewing_key for your account on the contract. You can do this with the following command:
+```
+secretcli tx compute execute "<coin_contract_address" '{"set_viewing_key": {"key": "<whatever_you_want_your_key_to_be"}}' --from <your_wallet_name> --gas 200000
+```
+
+Then you can query your balance with the following:
+
+```
+secretcli query snip20 balance "<coin_contract_address" "<your_wallet_address>" "<viewing_key>"
+```
+
+This should return something like the following confirming you now have 1 billion of your newly created coin available in your wallet:
+
+```
+{"balance":{"amount":"1000000000"}}
+```
