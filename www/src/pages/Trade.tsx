@@ -4,7 +4,7 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
-import { try_query_contracts, balanceResponse } from "../secretClient";
+import { try_query_contracts } from "../secretClient";
 import TradeItem from "../components/TradeItem";
 import AcceptTradeModel from "../components/AcceptTradeModel";
 
@@ -19,7 +19,8 @@ const Trade = () => {
     receiving: [],
   });
 
-  const handleClick = () => {
+  const handleClick = (index: number) => {
+    {setSelectedContract(contracts[index])}
     {setIsDialogOpen(true)}
   }
 
@@ -30,7 +31,7 @@ const Trade = () => {
 
   const contractDisplays = () => {
     return contracts.map((contract, index) => (
-      <div key={index} onClick={() => handleClick()}>
+      <div key={index} onClick={() => handleClick(index)}>
         <TradeItem contract={contract}/>
       </div>
     ));

@@ -21,25 +21,27 @@ const AcceptTradeModel = (props: any) => {
         </p>
 
         <div className="mt-5 flex flex-col gap-1">
-              <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Receive:</label>
-              <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
-                  <div className='flex w-full justify-between items-center'>
-                      <p className='font-bold text-white text-sm'>500 ETH</p>
-                      <img src="images/ETH.png" className='h-6'/>
-                  </div>
-              </span>
-          </div>
-
-          <div className="mt-3 flex flex-col gap-1">
               <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Give:</label>
 
               <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
                   <div className='flex w-full justify-between items-center'>
-                      <p className='font-bold text-white text-sm'>1 BTC</p>
-                      <img src="images/BTC.png" className='h-6'/>
+                      <p className='font-bold text-white text-sm'>{props.contract.giving_amount} {props.contract.giving_coin}</p>
+                      <img src={`images/${props.contract.giving_coin}.png`} className='h-6'/>
                   </div>
               </span>
           </div>
+
+        <div className="mt-3 flex flex-col gap-1">
+              <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Receive:</label>
+              <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
+                  <div className='flex w-full justify-between items-center'>
+                      <p className='font-bold text-white text-sm'>{props.contract.receiving_amount} {props.contract.receiving_coin}</p>
+                      <img src={`images/${props.contract.receiving_coin}.png`} className='h-6'/>
+                  </div>
+              </span>
+          </div>
+
+          
 
 
           <div className='mt-8 flex justify-between items-center'>
