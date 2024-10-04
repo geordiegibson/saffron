@@ -37,7 +37,7 @@ const Trade = () => {
 
   // Moves to the next page of 12 contracts
   const nextPage = () => {
-    if (pageStartIndex + 12 < contracts.length) {
+    if (pageStartIndex + 12 < displayContracts.length) {
       setPageStartIndex((prev) => prev + 12)
     }
   }
@@ -53,13 +53,17 @@ const Trade = () => {
 
   // Filters the contracts by the currently applied filters.
   let filter = () => {
-    let filtered_result
-    if (filters.giving.length > 0 || filters.receiving.length > 0) {
-      // This is hacky asf to get around the fact contract responses from the network aren't serialized properly yet. But it works ;)
-      filtered_result = contracts.filter((contract) => filters.giving.includes(contract.giving_coin.toString()) && filters.receiving.includes(contract.receiving_coin.toString()))
-    } else {
-      filtered_result = contracts
+
+    let filtered_result = contracts
+
+    if (filters.giving.length > 0) {
+      filtered_result = filtered_result.filter((contract) => filters.giving.includes(contract.giving_coin.toString()))
+    } 
+    
+    if (filters.receiving.length > 0) {
+      filtered_result = filtered_result.filter((contract) => filters.receiving.includes(contract.receiving_coin.toString()))
     }
+    setPageStartIndex(0)
     setDisplayContracts(filtered_result)
   }
 
@@ -167,7 +171,7 @@ const Trade = () => {
 
             <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 bg-zinc-900 rounded-xl">
               <button onClick={() => previousPage()} className="w-24 text-white p-3 text-xl rounded-xl"><i className="text-bold bi bi-arrow-left"></i></button>
-              <p className="text-white text-lg font-bold">{pageStartIndex / 12 + 1} / {Math.ceil(contracts.length / 12)}</p>
+              <p className="text-white text-lg font-bold">{pageStartIndex / 12 + 1} / {Math.ceil(displayContracts.length / 12)}</p>
               <button onClick={() => nextPage()} className="w-24 text-white text-xl p-3 rounded-xl"><i className="bi bi-arrow-right"></i></button>
             </div>
           </>
