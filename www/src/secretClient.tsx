@@ -31,18 +31,26 @@ export const try_query_contracts = async () => {
 };
 
 // Attempts to send the currency to the escrow. If successful, the contract is added to the escrow.
-export const try_transfer_funds = async (contract: Contract) => {
-    
-    console.log("Sending the currency")
+export const try_transfer_funds = async (contract: Contract): Promise<boolean> => {
 
-    transfer_snip20(contract.giving_coin, contract.giving_amount).then((result) => {
+  console.log(`Sending the currency: ${contract.giving_coin.name}`);
+
+  try {
+      const result = await transfer_snip20(contract.giving_coin, contract.giving_amount);
+      
       if (result.code === 0) {
-        console.log("Sent the currency successfully!")
-        try_create_contract(contract)
-      } else {
-        console.log("Currency failed to send")
+          console.log("Sent the currency successfully!");
+          await try_create_contract(contract);
+          return true;
       }
-    })
+
+      console.log("Currency failed to send");
+      return false;
+
+  } catch (error) {
+      console.error("An error occurred during transfer", error);
+      return false;
+  }
 };
 
 // Creates the contract on the escrow
@@ -53,7 +61,7 @@ const try_create_contract = async (contract: Contract) => {
     contract_address: import.meta.env.VITE_contractAddress,
     code_hash: import.meta.env.VITE_contractCodeHash,
     msg: {
-        add_contract: {giving_coin: contract.giving_coin, giving_amount: contract.giving_amount, receiving_coin: contract.receiving_coin, receiving_amount: contract.receiving_amount},
+        add_contract: {giving_coin: contract.giving_coin.abbreviation, giving_amount: contract.giving_amount, receiving_coin: contract.receiving_coin.abbreviation, receiving_amount: contract.receiving_amount},
     },
     sent_funds: [],
   },
@@ -67,6 +75,7 @@ console.log("Created contract")
   
 // Transfer coins to from the users wallet to the escrow contract
 export let transfer_snip20 = async (coin: Coin, amount: number) => {
+
   let executeMsg = {
     transfer: {
       owner: wallet.address,
@@ -78,8 +87,8 @@ export let transfer_snip20 = async (coin: Coin, amount: number) => {
   let tx = await secretjs.tx.compute.executeContract(
     {
       sender: wallet.address,
-      contract_address: coin.contract_address,
-      code_hash: coin.contract_hash,
+      contract_address: coin.contract_address as string,
+      code_hash: coin.contract_hash as string,
       msg: executeMsg,
     },
     {
