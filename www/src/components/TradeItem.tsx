@@ -60,7 +60,7 @@ const TradeItem = (props: {contract: Contract}) => {
 
     return (
 
-        <div className="h-max bg-neutral-900 rounded-lg mt-5 p-5 flex flex-col justify-center items-center w-full">
+        <div className="h-max bg-neutral-900 rounded-lg p-5 flex flex-col justify-center items-center w-full">
 
 
             <div className='flex flex-row justify-between w-full'>

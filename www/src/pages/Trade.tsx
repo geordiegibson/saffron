@@ -14,29 +14,50 @@ const Trade = () => {
   const [filterCount, setFilterCount] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState<Contract | null>()
+  const [displayContracts, setDisplayContracts] = useState<Array<Contract>>([])
   const [filters, setFilters] = useState<Filters>({
     giving: [],
     receiving: [],
   });
+  
 
+  // Handles the event a user clicks on a contract. Opens the Accept Contract modal.
   const handleClick = (index: number) => {
     {setSelectedContract(contracts[index])}
     {setIsDialogOpen(true)}
   }
 
+  // Callback to be passed to the Accept Contract modal to handle close event.
   const closeDialog = () => {
     setIsDialogOpen(false);
     setSelectedContract(null);
   };
 
-  const contractDisplays = () => {
-    return contracts.map((contract, index) => (
+
+  // Filters the contracts by the currently applied filters.
+  let filter = () => {
+    let filtered_result
+    if (filters.giving.length > 0 || filters.receiving.length > 0) {
+      // This is hacky asf to get around the fact contract responses from the network aren't serialized properly yet. But it works ;)
+      filtered_result = contracts.filter((contract) => filters.giving.includes(contract.giving_coin.toString()) || filters.receiving.includes(contract.receiving_coin.toString()))
+    } else {
+      filtered_result = contracts
+    }
+    setDisplayContracts(filtered_result)
+  }
+
+
+  // Creates the contract display cards.
+  const display_contracts = () => {
+    return displayContracts.slice(0,12).map((contract, index) => (
       <div key={index} onClick={() => handleClick(index)}>
         <TradeItem contract={contract}/>
       </div>
     ));
   };
 
+
+  // Applies the filters whenever the user updates them in the filter menu
   useEffect(() => {
     let count = 0;
     if (filters.giving.length > 0) {
@@ -46,14 +67,21 @@ const Trade = () => {
       count += 1;
     }
     setFilterCount(count);
+    filter()
   }, [filters]);
 
+
+  // Fetch contracts from the network on load
   useEffect(() => {
-    try_query_contracts().then((contracts) => setContracts(contracts));
+    try_query_contracts().then((contracts) => {
+      setContracts(contracts); 
+      setDisplayContracts(contracts) 
+    });
   }, []);
 
+
   return (
-    <div className="flex flex-col h-screen w-screen items-center">
+    <div className="flex flex-col h-max w-screen items-center">
       <Title title="Trade" description="Browse Global Contracts" />
 
       {/* Main content */}
@@ -104,9 +132,11 @@ const Trade = () => {
           />
         </div>
 
-        {contracts.length > 0 ? (
-          <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contractDisplays()}
+        {displayContracts.length > 0 ? (
+          <div className="grid mt-5 mb-20 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            {display_contracts()}
+
             {isDialogOpen && (
               <AcceptTradeModel
                 isOpen={isDialogOpen}
@@ -114,6 +144,8 @@ const Trade = () => {
                 contract={selectedContract}
               />
             )}
+
+            
           </div>
         ) : (
           <NoResults
