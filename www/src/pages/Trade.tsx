@@ -15,6 +15,7 @@ const Trade = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState<Contract | null>()
   const [displayContracts, setDisplayContracts] = useState<Array<Contract>>([])
+  const [pageStartIndex, setPageStartIndex] = useState(0)
   const [filters, setFilters] = useState<Filters>({
     giving: [],
     receiving: [],
@@ -34,6 +35,22 @@ const Trade = () => {
   };
 
 
+  // Moves to the next page of 12 contracts
+  const nextPage = () => {
+    if (pageStartIndex + 12 < contracts.length) {
+      setPageStartIndex((prev) => prev + 12)
+    }
+  }
+
+  
+  // Moves to the previous page of 12 contracts
+  const previousPage = () => {
+    if (pageStartIndex - 12 >= 0) {
+      setPageStartIndex((prev) => prev - 12)
+    }
+  }
+
+
   // Filters the contracts by the currently applied filters.
   let filter = () => {
     let filtered_result
@@ -49,7 +66,7 @@ const Trade = () => {
 
   // Creates the contract display cards.
   const display_contracts = () => {
-    return displayContracts.slice(0,12).map((contract, index) => (
+    return displayContracts.slice(pageStartIndex, pageStartIndex + 12).map((contract, index) => (
       <div key={index} onClick={() => handleClick(index)}>
         <TradeItem contract={contract}/>
       </div>
@@ -133,20 +150,28 @@ const Trade = () => {
         </div>
 
         {displayContracts.length > 0 ? (
-          <div className="grid mt-5 mb-20 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            {display_contracts()}
+          <>
+            <div className="grid mt-5 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              
+              {display_contracts()}
 
-            {isDialogOpen && (
-              <AcceptTradeModel
-                isOpen={isDialogOpen}
-                onClose={closeDialog}
-                contract={selectedContract}
-              />
-            )}
+              {isDialogOpen && (
+                <AcceptTradeModel
+                  isOpen={isDialogOpen}
+                  onClose={closeDialog}
+                  contract={selectedContract}
+                />
+              )}
 
-            
-          </div>
+            </div>
+
+            <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 bg-zinc-900 rounded-xl">
+              <button onClick={() => previousPage()} className="w-24 text-white p-3 text-xl rounded-xl"><i className="text-bold bi bi-arrow-left"></i></button>
+              <p className="text-white text-lg font-bold">{pageStartIndex / 12 + 1} / {Math.ceil(contracts.length / 12)}</p>
+              <button onClick={() => nextPage()} className="w-24 text-white text-xl p-3 rounded-xl"><i className="bi bi-arrow-right"></i></button>
+            </div>
+          </>
+
         ) : (
           <NoResults
             icon={<i className="bi bi-bank"></i>}
