@@ -1,7 +1,7 @@
 type Contract = {
-    giving_coin: string,
+    giving_coin: Coin,
     giving_amount: number,
-    receiving_coin: string,
+    receiving_coin: Coin,
     receiving_amount: number
 }
 

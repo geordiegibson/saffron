@@ -3,27 +3,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
 import AvatarStack from '../AvatarStack'
-
-const coins = [
-  {
-    id: 1,
-    abr: 'SCRT',
-    name: "secret",
-    avatar: 'images/SCRT.png',
-  },
-  {
-    id: 2,
-    abr: 'ETH',
-    name: "ethereum",
-    avatar: 'images/ETH.png',
-  },
-  {
-    id: 3,
-    abr: 'BTC',
-    name: "bitcoin",
-    avatar: 'images/BTC.png',
-  },
-]
+import { supportedCoins } from '../../acceptedCoins'
 
 type CoinFilterProps = {
   name: string,
@@ -71,23 +51,23 @@ const CoinFilter = (props: CoinFilterProps) => {
           transition
           className="absolute bg-zinc-800 w-full z-10 mt-1 max-h-56 overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
         >
-          {coins.map((coin) => (
+          {supportedCoins.map((coin, index) => (
             <ListboxOption
-              key={coin.id}
-              value={coin.id}
-              onClick={() => handleSelect(coin.name)}
+              key={index}
+              value={index}
+              onClick={() => handleSelect(coin.abbreviation)}
               className={`group w-full hover:bg-indigo-500 relative cursor-default select-none p-3 px-4 flex text-gray-900 ${
                 isSelected(coin.name) ? 'bg-indigo-600 text-white' : 'text-white'
               }`}
             >
               <div className="flex items-center">
-                <img alt="" src={coin.avatar} className="h-5 w-5 flex-shrink-0 rounded-full" />
+                <img alt="" src={coin.img} className="h-5 w-5 flex-shrink-0 rounded-full" />
                 <span
                   className={`ml-2 w-max block truncate ${
                     isSelected(coin.name) ? 'font-semibold' : 'font-normal'
                   }`}
                 >
-                  {coin.abr}
+                  {coin.abbreviation}
                 </span>
               </div>
             </ListboxOption>

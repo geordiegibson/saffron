@@ -1,8 +1,8 @@
 import AvatarSelect from "./CoinDropdown";
 
 interface CryptoInputProps {
-  selectedCoin: { id: number, name: string, avatar: string };
-  onCoinChange: (coin: { id: number, name: string, avatar: string }) => void;
+  selectedCoin: Coin
+  onCoinChange: (coin: Coin) => void;
   amount: number;
   onAmountChange: (amount: number) => void;
 }

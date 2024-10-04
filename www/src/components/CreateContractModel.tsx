@@ -2,26 +2,26 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
-import {try_create_contract} from '../secretClient'
+import {try_transfer_funds} from '../secretClient'
 import { useState } from 'react';
 
 const CreateContractModel = (props: any) => {
-  const initialCoin = { id: 1, name: 'SCRT', avatar: 'images/SCRT.png' };
+  const initialCoin = { name: 'Secret', abbreviation: "SCRT", img: 'images/SCRT.png', contract_address: "", contract_hash: "" };
   // State for the form inputs
-  const [givingCoin, setGivingCoin] = useState(initialCoin);
+  const [givingCoin, setGivingCoin] = useState<Coin>(initialCoin);
   const [givingAmount, setGivingAmount] = useState(500);
-  const [receivingCoin, setReceivingCoin] = useState(initialCoin);
+  const [receivingCoin, setReceivingCoin] = useState<Coin>(initialCoin);
   const [receivingAmount, setReceivingAmount] = useState(13);
 
   // Function to handle contract creation
   const handleCreateContract = () => {
     const contract = {
-      giving_coin: givingCoin.name,
+      giving_coin: givingCoin,
       giving_amount: givingAmount,
-      receiving_coin: receivingCoin.name,
+      receiving_coin: receivingCoin,
       receiving_amount: receivingAmount
     };
-    try_create_contract(contract);
+    try_transfer_funds(contract);
   };
 
   return (
