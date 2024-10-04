@@ -19,7 +19,7 @@ const Trade = () => {
     giving: [],
     receiving: [],
   });
-  
+
 
   // Handles the event a user clicks on a contract. Opens the Accept Contract modal.
   const handleClick = (index: number) => {
@@ -39,7 +39,7 @@ const Trade = () => {
     let filtered_result
     if (filters.giving.length > 0 || filters.receiving.length > 0) {
       // This is hacky asf to get around the fact contract responses from the network aren't serialized properly yet. But it works ;)
-      filtered_result = contracts.filter((contract) => filters.giving.includes(contract.giving_coin.toString()) || filters.receiving.includes(contract.receiving_coin.toString()))
+      filtered_result = contracts.filter((contract) => filters.giving.includes(contract.giving_coin.toString()) && filters.receiving.includes(contract.receiving_coin.toString()))
     } else {
       filtered_result = contracts
     }
