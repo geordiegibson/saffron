@@ -1,7 +1,10 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import { useState } from 'react';
 
 const AcceptTradeModel = (props: any) => {
+
+  const [confirmed, setConfirmed] = useState(false)
 
   const handleAcceptTrade = () => {
     console.log("Trade Accepted")
@@ -11,40 +14,54 @@ const AcceptTradeModel = (props: any) => {
     <Dialog.Root open={props.isOpen} onOpenChange={props.onClose}>
     <Dialog.Portal>
       <Dialog.Overlay className="bg-blackA11 data-[state=open]:animate-overlayShow fixed inset-0" />
-      <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-neutral-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
+      <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-zinc-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
        
-        <Dialog.Title className="text-white m-0 text-[17px] text-lg font-bold">
-          Are you Absolutely Sure?
-        </Dialog.Title>
-        
+        <p className="text-white m-0 font-bold">
+          Accept Trade
+        </p>
 
-        <span className="mt-8 w-full inline-flex items-center justify-between px-6 py-3 text-green-200 bg-green-900/30 rounded-xl">
-          <p className='text-sm'>You Receive:</p>
-
-          <div className='flex gap-2 items-center'>
-              <img src="images/ETH.png" className='h-8'/>
-              <p className='font-bold'>500 ETH</p>
+        <div className="mt-5 flex flex-col gap-1">
+              <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Receive:</label>
+              <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
+                  <div className='flex w-full justify-between items-center'>
+                      <p className='font-bold text-white text-sm'>500 ETH</p>
+                      <img src="images/ETH.png" className='h-6'/>
+                  </div>
+              </span>
           </div>
-         
-        </span>
 
-        <span className="mb-1 mt-3 w-full gap-16 inline-flex  justify-between items-center px-6 py-3 text-red-200 bg-red-900/30 rounded-xl">
-          <p className='text-sm'>You Give:</p>
+          <div className="mt-3 flex flex-col gap-1">
+              <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Give:</label>
 
-          <div className='flex gap-2 items-center'>
-              <img src="images/BTC.png" className='h-8'/>
-              <p className='font-bold'>1 BTC</p>
+              <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
+                  <div className='flex w-full justify-between items-center'>
+                      <p className='font-bold text-white text-sm'>1 BTC</p>
+                      <img src="images/BTC.png" className='h-6'/>
+                  </div>
+              </span>
           </div>
-         
-        </span>
 
-        <div className="mt-[25px] flex justify-end">
-          <Dialog.Close asChild>
-            <button onClick={handleAcceptTrade} className="bg-white text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
-              Accept
-            </button>
-          </Dialog.Close>
-        </div>
+
+          <div className='mt-8 flex justify-between items-center'>
+
+            <div className='flex gap-2'>
+              <input type="checkbox" className="h-5 w-5 bg-zinc-800 rounded text-gray-700" style={{ boxShadow: "none" }} />
+              <div>
+                <p onChange={() => setConfirmed((prev) => !prev)} className='text-white font-bold leading-none text-sm'>Confirm</p>
+                <p className='text-gray-400 text-sm'>I understand this cannot be undone</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Dialog.Close asChild>
+                <button onClick={handleAcceptTrade} className="bg-white text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+                  Accept
+                </button>
+              </Dialog.Close>
+            </div>
+
+          </div>
+          
 
         <Dialog.Close asChild>
           <button

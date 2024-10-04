@@ -103,12 +103,9 @@ const Trade = () => {
           />
         </div>
 
-        <button onClick={() => console.log(balanceResponse)} className="bg-white p-3 rounded-xl">Get Balance</button>
-
         {contracts.length > 0 ? (
           <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {contractDisplays()}
-            {/* Render AcceptTradeModel and pass props */}
             {isDialogOpen && (
               <AcceptTradeModel
                 isOpen={isDialogOpen}

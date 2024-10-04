@@ -17,7 +17,7 @@ export default function CryptoInput({ selectedCoin, onCoinChange, amount, onAmou
         value={amount}
         onChange={(e) => onAmountChange(Number(e.target.value))}
         placeholder="0.00"
-        className="block w-full bg-neutral-800 text-white rounded-md border-0 py-1.5 pr-20  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        className="w-full bg-zinc-800 text-white rounded-md border-0 py-1.5 pr-20 border-none focus:outline-none focus:ring-0 placeholder:text-gray-400 sm:text-sm sm:leading-6"
       />
       <div className="absolute inset-y-0 right-0 flex items-center">
         <label htmlFor="currency" className="sr-only">Currency</label>
