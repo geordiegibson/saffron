@@ -56,7 +56,7 @@ const AcceptTradeModel = (props: any) => {
 
             <div className="flex justify-end">
               <Dialog.Close asChild>
-                <button onClick={handleAcceptTrade} className="bg-white text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+                <button onClick={handleAcceptTrade} className="bg-white text-black text-sm h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
                   Accept
                 </button>
               </Dialog.Close>

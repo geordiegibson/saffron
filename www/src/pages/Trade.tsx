@@ -102,7 +102,7 @@ const Trade = () => {
 
 
   return (
-    <div className="flex flex-col h-max w-screen items-center">
+    <div className="flex flex-col min-h-screen w-screen items-center">
       <Title title="Trade" description="Browse Global Contracts" />
 
       {/* Main content */}
