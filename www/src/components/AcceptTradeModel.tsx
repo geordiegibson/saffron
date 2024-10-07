@@ -1,13 +1,14 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import { accept_contract } from '../secretClient.tsx'
 
 const AcceptTradeModel = (props: any) => {
 
   const [confirmed, setConfirmed] = useState(false)
 
   const handleAcceptTrade = () => {
-    console.log("Trade Accepted")
+    accept_contract(props.contract.receiving_coin, props.contract.receiving_amount)
   }
   
   return (

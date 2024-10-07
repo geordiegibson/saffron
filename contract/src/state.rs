@@ -1,23 +1,23 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Addr, Storage};
+use cosmwasm_std::{Addr, Storage, Uint128};
 use cosmwasm_storage::{singleton, singleton_read, ReadonlySingleton, Singleton};
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Contract {
+    pub id: String,
     pub giving_coin: String,
-    pub giving_amount: i32,
+    pub giving_amount: Uint128,
     pub receiving_coin: String,
-    pub receiving_amount: i32,
+    pub receiving_amount: Uint128,
     pub expiration: String
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct State {
-    pub count: i32,
     pub owner: Addr,
     pub contracts: Vec<Contract>
 }
