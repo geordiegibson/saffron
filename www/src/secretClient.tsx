@@ -92,7 +92,7 @@ export let accept_contract = async (contract: Contract) => {
       msg: executeMsg,
     },
     {
-      gasLimit: 100_000,
+      gasLimit: 200_000,
     }
   );
 

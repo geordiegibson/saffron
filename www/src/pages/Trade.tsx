@@ -4,7 +4,7 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
-import { try_query_contracts } from "../secretClient";
+import { balanceResponse, try_query_contracts } from "../secretClient";
 import TradeItem from "../components/TradeItem";
 import AcceptTradeModel from "../components/AcceptTradeModel";
 
@@ -153,6 +153,8 @@ const Trade = () => {
             }
           />
         </div>
+
+        <button onClick={() => console.log(balanceResponse)} className="bg-white p-3 rounded-xl">Get balance</button>
 
         {displayContracts.length > 0 ? (
           <>

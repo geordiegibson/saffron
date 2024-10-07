@@ -6,7 +6,7 @@ use cosmwasm_std::{
 
 use crate::msg::{ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryMsg};
 use crate::state::{config, config_read, State, Contract};
-use secret_toolkit::snip20::register_receive_msg;
+use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 
 #[entry_point]
 pub fn instantiate(
@@ -47,6 +47,8 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
     
     deps.api.debug("callback called");
 
+    let mut res = Response::default();
+
     if let Some(msg) = msg {
         match from_binary(&msg)? {
 
@@ -70,16 +72,43 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
 
             ExecuteReceiveMsg::Accept { id } => {
                 deps.api.debug("Received Accept Request");
-                
+                                
                 config(deps.storage).update::<_, StdError>(|mut state| {
-                    state.contracts.retain(|contract| contract.id != id);
-                    Ok(state)
+
+                    let contract = state.contracts.iter().find(|&contract| contract.id == id).unwrap();
+
+                    if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
+                        // Valid Acceptance. Send the currencies to each person and delete the contract.
+                        
+                        deps.api.debug("Valid Accept Request");
+
+                        let transfer_message = transfer_msg(sender.to_string(),
+                            contract.offering_amount,
+                            None,
+                            None, 
+                            256,
+                            "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                            contract.offering_coin_addr.to_string(),
+                        )?;
+
+                        deps.api.debug(&format!("Transfer Message {:?}", transfer_message));
+
+                        res = Response::new().add_message(transfer_message);
+                        
+                        state.contracts.retain(|contract| contract.id != id);
+
+                        Ok(state)
+                    } else {
+                        deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
+                        Ok(state)
+                    }
                 })?;
             }
         }
     }
-    Ok(Response::default())
+    Ok(res)
 }
+
 
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
