@@ -60,7 +60,7 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> StdResult<Resp
 }
 
 // User creates a new trade request
-pub fn try_add_contract(env: Env, deps: DepsMut, info: MessageInfo, giving_coin: String, giving_amount: i32, receiving_coin: String, receiving_amount: i32, expiration_int: i32) -> StdResult<Response> {
+pub fn try_add_contract(env: Env, deps: DepsMut, info: MessageInfo, giving_coin: String, giving_amount: i32, receiving_coin: String, receiving_amount: i32, expiration_int: u32) -> StdResult<Response> {
 
     let sender_address = info.sender.clone();
     config(deps.storage).update(|mut state| {
