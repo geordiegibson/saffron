@@ -13,7 +13,7 @@ type CoinFilterProps = {
 
 const CoinFilter = (props: CoinFilterProps) => {
 
-    const filter = props.name === 'Give' ? 'giving' : 'receiving'
+    const filter = props.name === 'Give' ? 'wanting' : 'offering'
 
     const handleSelect = (coinName: string) => {
       if (props.filter.includes(coinName)) {
@@ -55,19 +55,19 @@ const CoinFilter = (props: CoinFilterProps) => {
             <ListboxOption
               key={index}
               value={index}
-              onClick={() => handleSelect(coin.abbreviation)}
+              onClick={() => handleSelect(coin.address)}
               className={`group w-full hover:bg-indigo-500 relative cursor-default select-none p-3 px-4 flex text-gray-900 ${
-                isSelected(coin.name) ? 'bg-indigo-600 text-white' : 'text-white'
+                isSelected(coin.address) ? 'bg-indigo-600 text-white' : 'text-white'
               }`}
             >
               <div className="flex items-center">
                 <img alt="" src={coin.img} className="h-5 w-5 flex-shrink-0 rounded-full" />
                 <span
                   className={`ml-2 w-max block truncate ${
-                    isSelected(coin.name) ? 'font-semibold' : 'font-normal'
+                    isSelected(coin.address) ? 'font-semibold' : 'font-normal'
                   }`}
                 >
-                  {coin.abbreviation}
+                  {coin.abbr}
                 </span>
               </div>
             </ListboxOption>

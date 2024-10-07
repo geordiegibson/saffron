@@ -9,10 +9,10 @@ pub static CONFIG_KEY: &[u8] = b"config";
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Contract {
     pub id: String,
-    pub giving_coin: String,
-    pub giving_amount: Uint128,
-    pub receiving_coin: String,
-    pub receiving_amount: Uint128,
+    pub offering_coin_addr: String,
+    pub offering_amount: Uint128,
+    pub wanting_coin_addr: String,
+    pub wanting_amount: Uint128,
     pub expiration: String
 }
 

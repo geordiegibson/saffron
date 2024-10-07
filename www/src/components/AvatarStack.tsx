@@ -1,3 +1,5 @@
+import {getCoinByAddr } from "../acceptedCoins"
+
 type AvatarStackProps = {
     coins: Array<string>
 }
@@ -8,7 +10,7 @@ const AvatarStack = (props: AvatarStackProps) => {
       return props.coins.map((coin) => (
         <img
             alt=""
-            src={`images/${coin}.png`}
+            src={getCoinByAddr(coin)?.img}
             className="inline-block h-6 w-6 rounded-full  ring-white"
           />
        )) 

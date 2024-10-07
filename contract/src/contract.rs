@@ -50,16 +50,16 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
     if let Some(msg) = msg {
         match from_binary(&msg)? {
 
-            ExecuteReceiveMsg::Create { requesting_coin, requesting_amount } => {
+            ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
                 deps.api.debug("Received Create Request");
 
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
                         id: state.current_contract_id.to_string(),
-                        giving_coin: "SCRT".to_string(), 
-                        giving_amount: amount,
-                        receiving_coin: requesting_coin,
-                        receiving_amount: requesting_amount,
+                        offering_coin_addr: info.sender.to_string(), 
+                        offering_amount: amount,
+                        wanting_coin_addr: wanting_coin_addr,
+                        wanting_amount: wanting_amount,
                         expiration: String::new(),
                     };
                     state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);

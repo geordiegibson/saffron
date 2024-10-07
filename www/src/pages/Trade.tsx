@@ -17,8 +17,8 @@ const Trade = () => {
   const [displayContracts, setDisplayContracts] = useState<Array<Contract>>([])
   const [pageStartIndex, setPageStartIndex] = useState(0)
   const [filters, setFilters] = useState<Filters>({
-    giving: [],
-    receiving: [],
+    wanting: [],
+    offering: [],
   });
 
 
@@ -56,13 +56,14 @@ const Trade = () => {
 
     let filtered_result = contracts
 
-    if (filters.giving.length > 0) {
-      filtered_result = filtered_result.filter((contract) => filters.giving.includes(contract.giving_coin.toString()))
+    if (filters.wanting.length > 0) {
+      filtered_result = filtered_result.filter((contract) => filters.wanting.includes(contract.wanting_coin_addr.toString()))
     } 
     
-    if (filters.receiving.length > 0) {
-      filtered_result = filtered_result.filter((contract) => filters.receiving.includes(contract.receiving_coin.toString()))
+    if (filters.offering.length > 0) {
+      filtered_result = filtered_result.filter((contract) => filters.offering.includes(contract.offering_coin_addr.toString()))
     }
+
     setPageStartIndex(0)
     setDisplayContracts(filtered_result)
   }
@@ -81,10 +82,10 @@ const Trade = () => {
   // Applies the filters whenever the user updates them in the filter menu
   useEffect(() => {
     let count = 0;
-    if (filters.giving.length > 0) {
+    if (filters.wanting.length > 0) {
       count += 1;
     }
-    if (filters.receiving.length > 0) {
+    if (filters.offering.length > 0) {
       count += 1;
     }
     setFilterCount(count);

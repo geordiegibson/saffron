@@ -1,15 +1,23 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { accept_contract } from '../secretClient.tsx'
+import { getCoinByAddr } from '../acceptedCoins.ts';
 
 const AcceptTradeModel = (props: any) => {
 
   const [confirmed, setConfirmed] = useState(false)
+  const [wantingCoin, setWantingCoin] = useState<Coin | undefined>()
+  const [offeringCoin, setOfferingCoin] = useState<Coin | undefined>()
 
   const handleAcceptTrade = () => {
-    accept_contract(props.contract.id, props.contract.receiving_coin, props.contract.receiving_amount)
+    accept_contract(props.contract)
   }
+
+  useEffect(() => {
+    setWantingCoin(getCoinByAddr(props.contract.wanting_coin_addr))
+    setOfferingCoin(getCoinByAddr(props.contract.offering_coin_addr))
+  }, [])
   
   return (
     <Dialog.Root open={props.isOpen} onOpenChange={props.onClose}>
@@ -26,8 +34,8 @@ const AcceptTradeModel = (props: any) => {
 
               <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
                   <div className='flex w-full justify-between items-center'>
-                      <p className='font-bold text-white text-sm'>{props.contract.giving_amount} {props.contract.giving_coin}</p>
-                      <img src={`images/${props.contract.giving_coin}.png`} className='h-6'/>
+                      <p className='font-bold text-white text-sm'>{props.contract.wanting_amount} {wantingCoin?.abbr}</p>
+                      <img src={wantingCoin?.img} className='h-6'/>
                   </div>
               </span>
           </div>
@@ -36,8 +44,8 @@ const AcceptTradeModel = (props: any) => {
               <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Receive:</label>
               <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
                   <div className='flex w-full justify-between items-center'>
-                      <p className='font-bold text-white text-sm'>{props.contract.receiving_amount} {props.contract.receiving_coin}</p>
-                      <img src={`images/${props.contract.receiving_coin}.png`} className='h-6'/>
+                      <p className='font-bold text-white text-sm'>{props.contract.offering_amount} {offeringCoin?.abbr}</p>
+                      <img src={offeringCoin?.img} className='h-6'/>
                   </div>
               </span>
           </div>

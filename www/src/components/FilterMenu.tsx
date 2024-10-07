@@ -39,8 +39,8 @@ export default function FilterMenu(props: FilterMenuProps) {
                 {/* Coin Select */}
                 <div className='flex flex-col gap-2 mt-3'>
                   <p className='text-gray-400 geist text-xs'>I want to:</p>
-                  <CoinFilter name="Give" filter={props.filters.giving} updateFilter={props.updateFilters} />
-                  <CoinFilter name="Receive" filter={props.filters.receiving} updateFilter={props.updateFilters} />
+                  <CoinFilter name="Give" filter={props.filters.wanting} updateFilter={props.updateFilters} />
+                  <CoinFilter name="Receive" filter={props.filters.offering} updateFilter={props.updateFilters} />
                 </div>
 
                 <div className='flex flex-col mt-5'>

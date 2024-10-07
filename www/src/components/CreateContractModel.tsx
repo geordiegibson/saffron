@@ -27,7 +27,15 @@ const CreateContractModel = (props: any) => {
 
     setModalState(ModalState.LOADING)
     
-    create_contract(receivingCoin, receivingAmount).then((success) => {
+    let contract: Contract = {
+      id: null,
+      offering_coin_addr: givingCoin.address,
+      offering_amount: givingAmount,
+      wanting_coin_addr: receivingCoin.address,
+      wanting_amount: receivingAmount,
+    }
+
+    create_contract(contract).then((success) => {
       if (success) {
         setModalState(ModalState.SUCCESS)
       } else {

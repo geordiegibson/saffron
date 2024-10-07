@@ -21,8 +21,8 @@ pub enum ExecuteMsg {
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteReceiveMsg {
     Create {
-        requesting_coin: String,
-        requesting_amount: Uint128,
+        wanting_coin_addr: String,
+        wanting_amount: Uint128,
     },
     Accept {
         id: String

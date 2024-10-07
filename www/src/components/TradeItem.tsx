@@ -1,4 +1,16 @@
+import { useState, useEffect } from 'react';
+import { getCoinByAddr } from '../acceptedCoins.ts';
+
 const TradeItem = (props: {contract: Contract}) => {
+
+    const [confirmed, setConfirmed] = useState(false)
+    const [wantingCoin, setWantingCoin] = useState<Coin | undefined>()
+    const [offeringCoin, setOfferingCoin] = useState<Coin | undefined>()
+
+    useEffect(() => {
+        setWantingCoin(getCoinByAddr(props.contract.wanting_coin_addr))
+        setOfferingCoin(getCoinByAddr(props.contract.offering_coin_addr))
+    }, [])
 
     // Update when we get date for the contract
     const date = "2024-09-21T23:59:59";
@@ -66,20 +78,18 @@ const TradeItem = (props: {contract: Contract}) => {
             <div className='flex flex-row justify-between w-full'>
                 <div className='flex-col justify-start items-center'>
                     <p className='text-neutral-400 text-sm'>You give:</p>
-                    <p className='font-bold text-white'>{props.contract.giving_amount} {props.contract.giving_coin}</p>
+                    <p className='font-bold text-white'>{props.contract.wanting_amount} {wantingCoin?.abbr}</p>
                 </div>
-                <img className='h-10' src={`images/${props.contract.giving_coin}.png`}
-                     alt={props.contract.giving_coin}/>
+                <img className='h-10' src={wantingCoin?.img} />
             </div>
 
 
             <div className='flex flex-row justify-between w-full mt-6'>
                 <div className='flex-col justify-start items-center'>
                     <p className='text-neutral-400 text-sm'>You receive:</p>
-                    <p className='font-bold text-white'>{props.contract.receiving_amount} {props.contract.receiving_coin}</p>
+                    <p className='font-bold text-white'>{props.contract.offering_amount} {offeringCoin?.abbr}</p>
                 </div>
-                <img className='h-10' src={`images/${props.contract.receiving_coin}.png`}
-                     alt={props.contract.receiving_coin}/>
+                <img className='h-10' src={offeringCoin?.img} />
             </div>
 
 
