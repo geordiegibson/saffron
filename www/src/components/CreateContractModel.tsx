@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
-import {try_transfer_funds} from '../secretClient'
+import { create_contract } from '../secretClient'
 import { useState } from 'react';
 import { supportedCoins } from '../acceptedCoins';
 
@@ -26,15 +26,8 @@ const CreateContractModel = (props: any) => {
   const handleCreateContract = () => {
 
     setModalState(ModalState.LOADING)
-
-    const contract = {
-      giving_coin: givingCoin,
-      giving_amount: givingAmount,
-      receiving_coin: receivingCoin,
-      receiving_amount: receivingAmount
-    }
     
-    try_transfer_funds(contract).then((success) => {
+    create_contract(receivingCoin, receivingAmount).then((success) => {
       if (success) {
         setModalState(ModalState.SUCCESS)
       } else {

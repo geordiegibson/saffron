@@ -30,71 +30,71 @@ export const try_query_contracts = async () => {
     return my_query.contracts
 };
 
-// Attempts to send the currency to the escrow. If successful, the contract is added to the escrow.
-export const try_transfer_funds = async (contract: Contract): Promise<boolean> => {
+// Attempt to create a contract by sending currency to the escrow with information surronding what you want in return.
+export let create_contract = async (coin: Coin, amount: number) => {
 
-  console.log(`Sending the currency: ${contract.giving_coin.name}`);
-
-  try {
-      const result = await transfer_snip20(contract.giving_coin, contract.giving_amount);
-      
-      if (result.code === 0) {
-          console.log("Sent the currency successfully!");
-          await try_create_contract(contract);
-          return true;
+  let request = {
+      create: {
+        requesting_coin: coin.abbreviation,
+        requesting_amount: amount.toString()
       }
-
-      console.log("Currency failed to send");
-      return false;
-
-  } catch (error) {
-      console.error("An error occurred during transfer", error);
-      return false;
   }
-};
-
-// Creates the contract on the escrow
-const try_create_contract = async (contract: Contract) => {
-  await secretjs.tx.compute.executeContract(
-    {
-    sender: wallet.address, 
-    contract_address: import.meta.env.VITE_contractAddress,
-    code_hash: import.meta.env.VITE_contractCodeHash,
-    msg: {
-        add_contract: {giving_coin: contract.giving_coin.abbreviation, giving_amount: contract.giving_amount, receiving_coin: contract.receiving_coin.abbreviation, receiving_amount: contract.receiving_amount},
-    },
-    sent_funds: [],
-  },
-  {
-    gasLimit: 100_000,
-  }
-);
-console.log("Created contract")
-}
-
   
-// Transfer coins to from the users wallet to the escrow contract
-export let transfer_snip20 = async (coin: Coin, amount: number) => {
-
   let executeMsg = {
-    transfer: {
+    send: {
       owner: wallet.address,
       amount: amount.toString(),
       recipient: import.meta.env.VITE_contractAddress,
+      msg: btoa(JSON.stringify(request))
     },
   };
 
   let tx = await secretjs.tx.compute.executeContract(
     {
       sender: wallet.address,
-      contract_address: coin.contract_address as string,
-      code_hash: coin.contract_hash as string,
+      contract_address: coin.contract_address,
+      code_hash: coin.contract_hash,
       msg: executeMsg,
     },
     {
       gasLimit: 100_000,
     }
   );
+  
+  console.log(tx)
+  return tx
+};
+
+// Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.
+export let accept_contract = async (id: string, coin: Coin, amount: number) => {
+
+  let request = {
+    accept: {
+      id
+    }
+  }
+
+  let executeMsg = {
+    send: {
+      owner: wallet.address,
+      amount: amount.toString(),
+      recipient: import.meta.env.VITE_contractAddress,
+      msg: btoa(JSON.stringify(request))
+    },
+  };
+
+  let tx = await secretjs.tx.compute.executeContract(
+    {
+      sender: wallet.address,
+      contract_address: "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v",
+      code_hash: "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257",
+      msg: executeMsg,
+    },
+    {
+      gasLimit: 100_000,
+    }
+  );
+
   console.log(tx)
   return tx
 };
