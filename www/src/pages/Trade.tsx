@@ -72,7 +72,7 @@ const Trade = () => {
   // Creates the contract display cards.
   const display_contracts = () => {
     return displayContracts.slice(pageStartIndex, pageStartIndex + 12).map((contract, index) => (
-      <div key={index} onClick={() => handleClick(index)}>
+      <div key={contract.id} onClick={() => handleClick(index)}>
         <TradeItem contract={contract}/>
       </div>
     ));
