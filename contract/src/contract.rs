@@ -1,14 +1,23 @@
+
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
+    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, WasmMsg,
 };
 
+use serde::Deserialize;
+use serde::Serialize;
 use crate::msg::{ContractsResponse, CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{config, config_read, State, Contract};
+
+#[derive(Serialize, Deserialize)]
+struct RegisterReceive {
+    code_hash: String,
+    padding: Option<String>,
+}
 
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
 ) -> StdResult<Response> {
@@ -18,12 +27,26 @@ pub fn instantiate(
         owner: info.sender.clone(),
     };
 
-    deps.api
-        .debug(format!("Contract was initialized by {}", info.sender).as_str());
     config(deps.storage).save(&state)?;
 
-    Ok(Response::default())
+    // Register a callback for when we receive Geordie Coin
+    let register_receive = RegisterReceive {
+        code_hash: "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(),
+        padding: None,
+    };
+
+    let register_msg = WasmMsg::Execute {
+        contract_addr: "secret1yt5x8vl7g7umaxqkn7l29x2nctq8y60fk2n29l".to_string(),
+        code_hash: "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(),
+        msg: to_binary(&register_receive)?,
+        funds: vec![],
+    };
+
+    Ok(Response::new()
+        .add_message(register_msg)
+        .add_attribute("method", "instantiate"))
 }
+
 
 #[entry_point]
 pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {

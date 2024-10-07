@@ -41,8 +41,6 @@ const AcceptTradeModel = (props: any) => {
               </span>
           </div>
 
-          
-
 
           <div className='mt-8 flex justify-between items-center'>
 

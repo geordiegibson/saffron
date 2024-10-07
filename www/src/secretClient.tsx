@@ -100,6 +100,33 @@ export let transfer_snip20 = async (coin: Coin, amount: number) => {
 };
 
 
+export let new_create_contract = async (coin: Coin, amount: number) => {
+
+  let executeMsg = {
+    send: {
+      owner: wallet.address,
+      amount: amount.toString(),
+      recipient: import.meta.env.VITE_contractAddress,
+      msg: "Hi my name is Geordie"
+    },
+  };
+
+  let tx = await secretjs.tx.compute.executeContract(
+    {
+      sender: wallet.address,
+      contract_address: coin.contract_address as string,
+      code_hash: coin.contract_hash as string,
+      msg: executeMsg,
+    },
+    {
+      gasLimit: 100_000,
+    }
+  );
+  console.log(tx)
+  return tx
+};
+
+
 // Query the users coin balance for a specific coin. Used for testing locally :)
 export let balanceResponse: any = await secretjs.query.compute.queryContract({
   contract_address: import.meta.env.VITE_coin_contractAddress as string,
