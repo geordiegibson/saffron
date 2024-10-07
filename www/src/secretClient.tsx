@@ -33,7 +33,6 @@ export const try_query_contracts = async () => {
 // Attempt to create a contract by sending currency to the escrow with information surronding what you want in return.
 export let create_contract = async (coin: Coin, amount: number) => {
 
-  console.log(coin.abbreviation)
   let request = {
       create: {
         requesting_coin: coin.abbreviation,
@@ -61,22 +60,26 @@ export let create_contract = async (coin: Coin, amount: number) => {
       gasLimit: 100_000,
     }
   );
+  
   console.log(tx)
   return tx
 };
 
 // Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.
-export let accept_contract = async (coin: Coin, amount: number) => {
+export let accept_contract = async (id: string, coin: Coin, amount: number) => {
 
-  console.log(coin)
-  console.log(amount)
+  let request = {
+    accept: {
+      id
+    }
+  }
 
   let executeMsg = {
     send: {
       owner: wallet.address,
       amount: amount.toString(),
       recipient: import.meta.env.VITE_contractAddress,
-      msg: btoa("{\"accept\": {\"id\": \"1\"}}")
+      msg: btoa(JSON.stringify(request))
     },
   };
 
@@ -91,6 +94,7 @@ export let accept_contract = async (coin: Coin, amount: number) => {
       gasLimit: 100_000,
     }
   );
+
   console.log(tx)
   return tx
 };

@@ -8,7 +8,7 @@ const AcceptTradeModel = (props: any) => {
   const [confirmed, setConfirmed] = useState(false)
 
   const handleAcceptTrade = () => {
-    accept_contract(props.contract.receiving_coin, props.contract.receiving_amount)
+    accept_contract(props.contract.id, props.contract.receiving_coin, props.contract.receiving_amount)
   }
   
   return (

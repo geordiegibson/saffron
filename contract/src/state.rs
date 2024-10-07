@@ -19,6 +19,7 @@ pub struct Contract {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct State {
     pub owner: Addr,
+    pub current_contract_id: Uint128,
     pub contracts: Vec<Contract>
 }
 

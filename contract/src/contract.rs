@@ -16,6 +16,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> StdResult<Response> {
     let state = State {
+        current_contract_id: Uint128::new(0),
         contracts: Vec::new(),
         owner: info.sender.clone(),
     };
@@ -54,13 +55,14 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
 
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
-                        id: "1".to_string(),
+                        id: state.current_contract_id.to_string(),
                         giving_coin: "SCRT".to_string(), 
                         giving_amount: amount,
                         receiving_coin: requesting_coin,
                         receiving_amount: requesting_amount,
                         expiration: String::new(),
                     };
+                    state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
                     state.contracts.push(contract);
                     Ok(state)
                 })?;
