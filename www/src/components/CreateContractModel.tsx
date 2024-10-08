@@ -10,7 +10,8 @@ enum ModalState {
   FORM,
   LOADING,
   SUCCESS,
-  FAIL
+  FAIL,
+  TIMEOUT
 }
 
 const CreateContractModel = (props: any) => {
@@ -41,6 +42,8 @@ const CreateContractModel = (props: any) => {
       } else {
         setModalState(ModalState.FAIL)
       }
+    }).catch(() => {
+      setModalState(ModalState.TIMEOUT);
     })
   };
 
@@ -117,6 +120,16 @@ const CreateContractModel = (props: any) => {
               <p className='text-center'>Failed to perform transaction. Please ensure you have sufficient funds.</p>
             </span>
           </div>
+        }
+
+        {modalState === ModalState.TIMEOUT &&
+
+        <div className='flex flex-col items-center h-full justify-center'>
+          <p><i className="text-5xl text-red-600 text-center bi bi-exclamation-circle-fill"></i></p>
+          <span className="my-8 w-full flex flex-col justify-between items-center px-6 py-3 text-red-200 bg-red-900/30 rounded-xl">
+            <p className='text-center'>Failed to perform transaction. Did you confirm in your Wallet extension?</p>
+          </span>
+        </div>
         }
 
         <Dialog.Close asChild>

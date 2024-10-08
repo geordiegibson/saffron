@@ -1,14 +1,15 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useState, useEffect, useRef } from 'react';
-import { accept_contract, try_query_contracts } from '../util/secretClient.ts'
+import { accept_contract } from '../util/secretClient.ts'
 import { getCoinByAddr } from '../util/acceptedCoins.ts';
 
 enum ModalState {
   FORM,
   LOADING,
   SUCCESS,
-  FAIL
+  FAIL,
+  TIMEOUT
 }
 
 const AcceptTradeModel = (props: any) => {
@@ -21,16 +22,19 @@ const AcceptTradeModel = (props: any) => {
   const checkboxRef = useRef(null);
 
   const handleAcceptTrade = () => {
-    console.log(confirmed)
+
     if (confirmed) {
+
       setModalState(ModalState.LOADING)
+      
       accept_contract(props.contract).then((response) => {
         if (response.code == 0) {
-          try_query_contracts()
           setModalState(ModalState.SUCCESS)
         } else {
           setModalState(ModalState.FAIL)
         }
+      }).catch(() => {
+        setModalState(ModalState.TIMEOUT);
       })
     } else {
       if (checkboxRef.current) {
@@ -123,6 +127,16 @@ const AcceptTradeModel = (props: any) => {
               <p className='text-center'>Failed to perform transaction. Please ensure you have sufficient funds.</p>
             </span>
           </div>
+        }
+
+        {modalState === ModalState.TIMEOUT &&
+
+        <div className='flex flex-col items-center h-full justify-center'>
+          <p><i className="text-5xl text-red-600 text-center bi bi-exclamation-circle-fill"></i></p>
+          <span className="my-8 w-full flex flex-col justify-between items-center px-6 py-3 text-red-200 bg-red-900/30 rounded-xl">
+            <p className='text-center'>Failed to perform transaction. Did you confirm in your Wallet extension?</p>
+          </span>
+        </div>
         }
           
 
