@@ -5,7 +5,7 @@ use cosmwasm_std::{
 };
 
 use crate::msg::{ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryMsg};
-use crate::state::{config, config_read, State, Contract};
+use crate::state::{config, config_read, ClientContract, Contract, State};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 
 #[entry_point]
@@ -58,6 +58,7 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
                         id: state.current_contract_id.to_string(),
+                        user_wallet_address: sender.to_string(),
                         offering_coin_addr: info.sender.to_string(), 
                         offering_amount: amount,
                         wanting_coin_addr: wanting_coin_addr,
@@ -78,11 +79,11 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
                     let contract = state.contracts.iter().find(|&contract| contract.id == id).unwrap();
 
                     if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
+
                         // Valid Acceptance. Send the currencies to each person and delete the contract.
-                        
                         deps.api.debug("Valid Accept Request");
 
-                        let transfer_message = transfer_msg(sender.to_string(),
+                        let intial_transfer_message = transfer_msg(sender.to_string(),
                             contract.offering_amount,
                             None,
                             None, 
@@ -90,10 +91,19 @@ pub fn try_receive(deps: DepsMut, info: MessageInfo, sender: Addr, from: Addr, a
                             "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
                             contract.offering_coin_addr.to_string(),
                         )?;
+                        deps.api.debug(&format!("Initial Transfer Message {:?}", intial_transfer_message));
 
-                        deps.api.debug(&format!("Transfer Message {:?}", transfer_message));
+                        let acceptance_transfer_message = transfer_msg(contract.user_wallet_address.to_string(),
+                            contract.wanting_amount,
+                            None,
+                            None, 
+                            256,
+                            "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                            contract.wanting_coin_addr.to_string(),
+                        )?;
+                        deps.api.debug(&format!("Acceptance Transfer Message {:?}", acceptance_transfer_message));
 
-                        res = Response::new().add_message(transfer_message);
+                        res = Response::default().add_message(intial_transfer_message).add_message(acceptance_transfer_message);
                         
                         state.contracts.retain(|contract| contract.id != id);
 
@@ -119,5 +129,6 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
     let state = config_read(deps.storage).load()?;
-    Ok(ContractsResponse { contracts: state.contracts })
+    let client_contracts: Vec<ClientContract> = state.contracts.into_iter().map(ClientContract::from).collect();
+    Ok(ContractsResponse { contracts: client_contracts })
 }

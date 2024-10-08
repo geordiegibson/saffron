@@ -1,7 +1,7 @@
 use cosmwasm_std::{Addr, Binary, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use crate::state::Contract;
+use crate::state::ClientContract;
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -37,5 +37,5 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ContractsResponse {
-    pub contracts: Vec<Contract>
+    pub contracts: Vec<ClientContract>
 }
