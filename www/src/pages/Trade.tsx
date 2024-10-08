@@ -4,7 +4,7 @@ import CreateContractModel from "../components/CreateContractModel";
 import FilterMenu from "../components/FilterMenu";
 import Title from "../components/common/Title";
 import NoResults from "../components/common/NoResults";
-import { balanceResponse, try_query_contracts } from "../util/secretClient";
+import { try_query_contracts } from "../util/secretClient";
 import TradeItem from "../components/TradeItem";
 import AcceptTradeModel from "../components/AcceptTradeModel";
 
@@ -153,10 +153,10 @@ const Trade = () => {
             }
           />
         </div>
-
+                  
         {displayContracts.length > 0 ? (
           <>
-            <div className="grid mt-5 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid mt-5 w-full flex-grow grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               
               {display_contracts()}
 
@@ -170,7 +170,8 @@ const Trade = () => {
 
             </div>
 
-            <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 bg-zinc-900 rounded-xl">
+            {/* Pagination */}
+            <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 rounded-xl">
               <button onClick={() => previousPage()} className="w-24 text-white p-3 text-xl rounded-xl"><i className="text-bold bi bi-arrow-left"></i></button>
               <p className="text-white text-lg font-bold">{pageStartIndex / 12 + 1} / {Math.ceil(displayContracts.length / 12)}</p>
               <button onClick={() => nextPage()} className="w-24 text-white text-xl p-3 rounded-xl"><i className="bi bi-arrow-right"></i></button>

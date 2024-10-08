@@ -117,20 +117,3 @@ export let accept_contract = async (contract: Contract) => {
   console.log(tx)
   return tx
 };
-
-// Query the users coin balance for a specific coin. Used for testing locally :)
-export let balanceResponse: any = async () => {
-
-  let client = await createExecuteClient()
-
-  await client.query.compute.queryContract({
-  contract_address: import.meta.env.VITE_coin_contractAddress as string,
-  code_hash: import.meta.env.VITE_coin_contractCodeHash as string,
-  query: {
-    balance: {
-      address: await getWalletAddress(),
-      key: "geordie"
-    }
-  },
-  });
-}

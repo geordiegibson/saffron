@@ -1,6 +1,7 @@
 import Menu from "../components/Menu"
-import { addLocalNetowrkToKeplr } from "../util/keplr";
+import { addLocalNetowrkToKeplr, getWalletAddress } from "../util/keplr";
 import Title from "../components/common/Title";
+import { useEffect, useState } from 'react'
 
 declare global {
     interface Window {
@@ -11,6 +12,12 @@ declare global {
 }
 
 const Wallet = () => {
+
+    const [connectedWallet, setConnectedWallet] = useState<String | null>(null)
+
+    useEffect(() => {
+        getWalletAddress().then(() => setConnectedWallet('keplr'))        
+    }, [])
     
     // Adds the locally running Secret Network to the Keplr wallet and connects.
     const connectKeplrWallet = async () => {
@@ -29,6 +36,7 @@ const Wallet = () => {
 
         const CHAIN_ID = "secretdev-1";
         await window.keplr.enable(CHAIN_ID);
+        setConnectedWallet('keplr')
     }
     
     return (
@@ -40,7 +48,7 @@ const Wallet = () => {
 
         <div className="flex flex-col gap-4 p-4 border border-zinc-900 bg-zinc-950 w-[75vw] lg:w-[35vw] h-max rounded-lg mt-5 bottom-animation">
 
-            <button onClick={connectKeplrWallet} className="flex justify-between pl-6 pr-4 items-center w-full h-16 rounded-lg bg-zinc-900 hover:bg-zinc-700">
+            <button onClick={connectKeplrWallet} className={`flex ${connectedWallet === 'keplr' ? 'bg-green-500/60 ring-1 ring-green-400': 'bg-zinc-900 hover:bg-zinc-700' } justify-between pl-6 pr-4 items-center w-full h-16 rounded-lg`}>
                 <p className="text-white font-bold geist">Keplr</p>
                 <img src="images/keplr.png" className="h-12 w-12"/>
             </button>
