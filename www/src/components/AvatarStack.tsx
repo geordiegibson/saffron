@@ -1,4 +1,4 @@
-import {getCoinByAddr } from "../acceptedCoins"
+import {getCoinByAddr } from "../util/acceptedCoins"
 
 type AvatarStackProps = {
     coins: Array<string>

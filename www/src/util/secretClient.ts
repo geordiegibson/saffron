@@ -1,26 +1,40 @@
-import { SecretNetworkClient, Wallet } from "secretjs";
+import { SecretNetworkClient } from "secretjs";
 import {getCoinByAddr} from "./acceptedCoins";
+import { getSigner, getWalletAddress, getEncryptionUtil} from './keplr'
 
-const wallet = new Wallet(import.meta.env.VITE_mnemonic);
+// SecretJS Client to perform query messages. Does not require a connected wallet.
+const createQueryClient = async () => {
 
-const secretjs = new SecretNetworkClient({
-  chainId: "secretdev-1",
-  url: "http://localhost:1317",
-  wallet: wallet,
-  walletAddress: wallet.address,
-});
+  let client: any = new SecretNetworkClient({
+    chainId: "secretdev-1",
+    url: "http://localhost:1317",
+  });
 
-// Get the users connected wallet address
-export const get_personal_address = () => {
-  return wallet.address;
-};
+  return client
+}
+
+// SecretJS Client to perform execute messages. Requires a connected wallet.
+const createExecuteClient = async () => {
+
+  let client: any = new SecretNetworkClient({
+    chainId: "secretdev-1",
+    url: "http://localhost:1317",
+    wallet: getSigner(),
+    walletAddress: await getWalletAddress(),
+    encryptionUtils: getEncryptionUtil(),
+  });
+
+  return client
+}
 
 // Fetches all escrow contracts
 export const try_query_contracts = async () => {
 
     console.log("Fetching contracts")
+    
+    let client = await createQueryClient();
 
-    const my_query: {contracts: Array<Contract>} = await secretjs.query.compute.queryContract({
+    const my_query: {contracts: Array<Contract>} = await client.query.compute.queryContract({
       contract_address: import.meta.env.VITE_contractAddress as string,
       code_hash: import.meta.env.VITE_contractCodeHash,
       query: { get_contracts: {} },
@@ -34,6 +48,8 @@ export const try_query_contracts = async () => {
 // Attempt to create a contract by sending currency to the escrow with information surronding what you want in return.
 export let create_contract = async (contract: Contract) => {
 
+  let client = await createExecuteClient();
+
   let request = {
       create: {
         wanting_coin_addr: contract.wanting_coin_addr,
@@ -43,16 +59,16 @@ export let create_contract = async (contract: Contract) => {
   
   let executeMsg = {
     send: {
-      owner: wallet.address,
+      owner: await getWalletAddress(),
       amount: contract.offering_amount.toString(),
       recipient: import.meta.env.VITE_contractAddress,
       msg: btoa(JSON.stringify(request))
     },
   };
 
-  let tx = await secretjs.tx.compute.executeContract(
+  let tx = await client.tx.compute.executeContract(
     {
-      sender: wallet.address,
+      sender: await getWalletAddress(),
       contract_address: contract.offering_coin_addr,
       code_hash: getCoinByAddr(contract.offering_coin_addr)?.hash,
       msg: executeMsg,
@@ -69,6 +85,8 @@ export let create_contract = async (contract: Contract) => {
 // Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.
 export let accept_contract = async (contract: Contract) => {
 
+  let client = await createExecuteClient();
+
   let request = {
     accept: {
       id: contract.id
@@ -77,16 +95,16 @@ export let accept_contract = async (contract: Contract) => {
 
   let executeMsg = {
     send: {
-      owner: wallet.address,
+      owner: await getWalletAddress(),
       amount: contract.wanting_amount.toString(),
       recipient: import.meta.env.VITE_contractAddress,
       msg: btoa(JSON.stringify(request))
     },
   };
 
-  let tx = await secretjs.tx.compute.executeContract(
+  let tx = await client.tx.compute.executeContract(
     {
-      sender: wallet.address,
+      sender: await getWalletAddress(),
       contract_address: contract.wanting_coin_addr,
       code_hash: getCoinByAddr(contract.wanting_coin_addr)?.hash,
       msg: executeMsg,
@@ -100,15 +118,19 @@ export let accept_contract = async (contract: Contract) => {
   return tx
 };
 
-
 // Query the users coin balance for a specific coin. Used for testing locally :)
-export let balanceResponse: any = await secretjs.query.compute.queryContract({
+export let balanceResponse: any = async () => {
+
+  let client = await createExecuteClient()
+
+  await client.query.compute.queryContract({
   contract_address: import.meta.env.VITE_coin_contractAddress as string,
   code_hash: import.meta.env.VITE_coin_contractCodeHash as string,
   query: {
     balance: {
-      address: get_personal_address(),
+      address: await getWalletAddress(),
       key: "geordie"
     }
   },
-});
+  });
+}

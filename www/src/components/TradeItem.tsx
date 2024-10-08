@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCoinByAddr } from '../acceptedCoins.ts';
+import { getCoinByAddr } from '../util/acceptedCoins.ts';
 
 const TradeItem = (props: {contract: Contract}) => {
 

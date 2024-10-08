@@ -2,9 +2,9 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
-import { create_contract } from '../secretClient'
+import { create_contract } from '../util/secretClient'
 import { useState } from 'react';
-import { supportedCoins } from '../acceptedCoins';
+import { supportedCoins } from '../util/acceptedCoins';
 
 enum ModalState {
   FORM,
@@ -35,8 +35,8 @@ const CreateContractModel = (props: any) => {
       wanting_amount: receivingAmount,
     }
 
-    create_contract(contract).then((success) => {
-      if (success) {
+    create_contract(contract).then((response) => {
+      if (response.code == 0) {
         setModalState(ModalState.SUCCESS)
       } else {
         setModalState(ModalState.FAIL)

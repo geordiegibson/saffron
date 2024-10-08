@@ -1,6 +1,6 @@
 'use client'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import {supportedCoins} from '../../acceptedCoins'
+import {supportedCoins} from '../../util/acceptedCoins'
 
 interface CoinDropdownProps {
   selectedCoin: Coin,

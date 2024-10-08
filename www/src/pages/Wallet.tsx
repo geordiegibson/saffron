@@ -1,5 +1,6 @@
 import Menu from "../components/Menu"
-import { SecretNetworkClient } from "secretjs";
+import { addLocalNetowrkToKeplr } from "../util/keplr";
+import Title from "../components/common/Title";
 
 declare global {
     interface Window {
@@ -7,11 +8,14 @@ declare global {
       getEnigmaUtils?: (chainId: string) => any; 
       getOfflineSignerOnlyAmino?: (chainId: string) => any;
     }
-  }
+}
 
 const Wallet = () => {
     
+    // Adds the locally running Secret Network to the Keplr wallet and connects.
     const connectKeplrWallet = async () => {
+
+        addLocalNetowrkToKeplr()
 
         const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,30 +27,15 @@ const Wallet = () => {
         await sleep(50);
         }
 
-        const CHAIN_ID = "pulsar-3";
+        const CHAIN_ID = "secretdev-1";
         await window.keplr.enable(CHAIN_ID);
-        const keplrOfflineSigner = window.keplr.getOfflineSignerOnlyAmino(CHAIN_ID);
-        const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
-
-        new SecretNetworkClient({
-        url: "https://api.pulsar3.scrttestnet.com",
-        chainId: CHAIN_ID,
-        wallet: keplrOfflineSigner,
-        walletAddress: myAddress,
-        encryptionUtils: window.keplr.getEnigmaUtils(CHAIN_ID),
-        });
     }
     
     return (
         <div className="flex flex-col min-h-screen w-screen items-center">
             
-        {/* Title */}
-        <div className="w-[75vw] lg:w-[50vw]">
-            <div className="flex flex-col pt-10 pb-5 top-animation">
-                <p className="text-neutral-400 font-bold">Select Wallet to Connect</p>
-                <p className="text-white inter" style={{"fontSize": "30px"}}>Wallet</p>
-            </div>
-        </div>
+        <Title title="Wallet" description="Select Wallet to Connect" />
+
 
 
         <div className="flex flex-col gap-4 p-4 border border-zinc-900 bg-zinc-950 w-[75vw] lg:w-[35vw] h-max rounded-lg mt-5 bottom-animation">

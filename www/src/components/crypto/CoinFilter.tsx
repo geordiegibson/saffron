@@ -3,7 +3,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
 import AvatarStack from '../AvatarStack'
-import { supportedCoins } from '../../acceptedCoins'
+import { supportedCoins } from '../../util/acceptedCoins'
 
 type CoinFilterProps = {
   name: string,

@@ -5,7 +5,7 @@ import {
   get_personal_address,
   // try_create_message,
   // try_query_all_messages,
-} from "../secretClient";
+} from "../util/secretClient";
 
 const Chat = () => {
   const [addr, setAddr] = useState("");

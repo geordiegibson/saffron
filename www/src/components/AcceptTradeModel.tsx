@@ -1,8 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useState, useEffect } from 'react';
-import { accept_contract } from '../secretClient.tsx'
-import { getCoinByAddr } from '../acceptedCoins.ts';
+import { accept_contract } from '../util/secretClient.ts'
+import { getCoinByAddr } from '../util/acceptedCoins.ts';
 
 const AcceptTradeModel = (props: any) => {
 
