@@ -31,9 +31,10 @@ schemars = { version = "0.8.11" }
 serde = { version = "1.0" }
 thiserror = { version = "1.0" }
 cosmwasm-schema = "1.0.0"
+minicbor-ser = "0.2.0"
 
 # Uncomment these for some common extra tools
-secret-toolkit = { git = "https://github.com/scrtlabs/secret-toolkit", tag = "v0.10.0" }
+secret-toolkit = { git = "https://github.com/SolarRepublic/secret-toolkit", features = ["permit", "notification"], rev = "8aed92d589dc119f69d20f8538d5a6eea8003d95" }
 # cw-storage-plus = { version = "1.0.1", default-features = false }
 
 # [patch.crates-io]

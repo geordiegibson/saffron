@@ -1,4 +1,5 @@
 use schemars::JsonSchema;
+use secret_toolkit::storage::Item;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{Addr, Storage, Uint128};
@@ -57,3 +58,6 @@ pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
 pub fn config_read(storage: &dyn Storage) -> ReadonlySingleton<State> {
     singleton_read(storage, CONFIG_KEY)
 }
+
+// SNIP-52 Private Push Notifications
+pub static SNIP52_INTERNAL_SECRET: Item<Vec<u8>> = Item::new(b"snip52-secret");
