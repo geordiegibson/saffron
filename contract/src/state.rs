@@ -1,11 +1,13 @@
 use schemars::JsonSchema;
 use secret_toolkit::storage::Item;
+use secret_toolkit_storage::Keymap;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{Addr, Storage, Uint128};
 use cosmwasm_storage::{singleton, singleton_read, ReadonlySingleton, Singleton};
 
 pub static CONFIG_KEY: &[u8] = b"config";
+pub static USER_ACTIVITIES_KEYMAP: Keymap<String, Vec<ActivityType>> = Keymap::new(b"user_activities");
 
 // Complete contract details stored on the server.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
@@ -42,6 +44,21 @@ impl From<Contract> for ClientContract {
             expiration: contract.expiration,
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub enum ActivityType {
+    CreatedContract,
+    AcceptedContract,
+    ContractAcceptedByOthers,
+    ExpiredContract,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+pub struct UserActivity {
+    pub event_type: ActivityType,
+    pub contract_id: String,
+    pub timestamp: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]

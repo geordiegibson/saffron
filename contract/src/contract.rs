@@ -7,9 +7,9 @@ use secret_toolkit::crypto::{hkdf_sha_256, sha_256, ContractPrng};
 use secret_toolkit::notification::{get_seed, notification_id, ChannelInfoData, Notification, NotificationData};
 use secret_toolkit::permit::Permit;
 
-use crate::msg::{ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
+use crate::msg::{ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
-use crate::state::{config, config_read, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET};
+use crate::state::{config, config_read, ActivityType, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 
 pub const SEED_LEN: usize = 32;
@@ -29,6 +29,7 @@ pub fn instantiate(
 
     config(deps.storage).save(&state)?;
 
+    // Register for SNIP-20 callback
     let register_msg = register_receive_msg(
         env.contract.code_hash.clone(), 
         None, 
@@ -36,6 +37,13 @@ pub fn instantiate(
         "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
         "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v".to_string(),
     )?;
+
+    // User Activity init
+    let initial_user_address = info.sender.to_string();
+    let initial_activities: Vec<ActivityType> = Vec::new(); // Start with an empty list for the user
+
+    USER_ACTIVITIES_KEYMAP.insert(deps.storage, &initial_user_address, &initial_activities)?;
+
 
     // SNIP-52 init
     // create an internal secret
@@ -76,6 +84,8 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
             ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
                 deps.api.debug("Received Create Request");
 
+                let mut activities: Vec<ActivityType> = USER_ACTIVITIES_KEYMAP.get(deps.storage, &info.sender.to_string()).unwrap_or_default();
+
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
                         id: state.current_contract_id.to_string(),
@@ -88,6 +98,9 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                     };
                     state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
                     state.contracts.push(contract);
+
+                    activities.push(ActivityType::CreatedContract);
+
                     Ok(state)
                 })?;
             },
@@ -160,6 +173,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
 pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetContracts {} => to_binary(&query_contracts(deps)?),
+        QueryMsg::GetActivity { user_address } => to_binary(&query_activity(deps, user_address)?),
         QueryMsg::WithPermit { permit, query } => permit_queries(deps, env, permit, query),
     }
 }
@@ -250,4 +264,13 @@ fn query_channel_info(
         channels: channels_data,
         seed,
     })
+}
+
+pub fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
+
+    let user_activity: Vec<ActivityType> = USER_ACTIVITIES_KEYMAP
+        .get(deps.storage, &user_address)
+        .unwrap_or_default();
+
+    Ok(ActivityResponse { activity: user_activity })
 }
