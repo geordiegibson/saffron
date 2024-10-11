@@ -1,5 +1,6 @@
-import {subscribe_snip52_channels} from '@solar-republic/neutrino';
+import {SecretContract, subscribe_snip52_channels} from '@solar-republic/neutrino';
 import { SecretNetworkClient } from 'secretjs';
+import { createExecuteClient } from './secretClient';
 
 const contractAddress = import.meta.env.VITE_contractAddress;
 
@@ -49,9 +50,14 @@ async function getPermit(address: string) {
     return permit;
 }
 
-async function notifyExample(secretjs: SecretNetworkClient) {
-    const permit = getPermit(secretjs.address);
-    await subscribe_snip52_channels("http://localhost:26657", contractAddress, permit, {
+export async function notifyExample() {
+    const client: SecretNetworkClient = await createExecuteClient();
+
+    const permit = await getPermit(client.address);
+
+    const contract = await SecretContract("http://localhost:1317", contractAddress);
+
+    await subscribe_snip52_channels("http://localhost:26657", contract, permit, {
         accepted(data: [string]) {
             const [accepted_id] = data;
 

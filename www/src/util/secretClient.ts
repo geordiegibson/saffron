@@ -14,7 +14,7 @@ const createQueryClient = async () => {
 }
 
 // SecretJS Client to perform execute messages. Requires a connected wallet.
-const createExecuteClient = async () => {
+export const createExecuteClient = async () => {
 
   let client: any = new SecretNetworkClient({
     chainId: "secretdev-1",
