@@ -1,12 +1,12 @@
 import Menu from "../components/Menu";
 import Title from "../components/common/Title";
 import { useState, useEffect } from 'react';
-import DirectEventAccepted from "../components/direct/DirectEventAccepted";
 import DirectEventCreated from "../components/direct/DirectEventCreated";
 import DirectEventExpired from "../components/direct/DirectEventExpired";
 import { query_activity } from "../util/secretClient";
 import NoResults from "../components/common/NoResults";
-import DirectEventContractComplete from "../components/direct/DirectEventContractComplete";
+import DirectEventComplete from "../components/direct/DirectEventComplete";
+import DirectEventAccepted from "../components/direct/DirectEventAccepted";
 
 const Direct = () => {
 
@@ -22,10 +22,10 @@ const Direct = () => {
                 return <DirectEventCreated contract={activity.contract}/>
             }
             else if (activity.activity_type === 2) {
-                return <DirectEventAccepted />
+                return <DirectEventAccepted contract={activity.contract}/>
             }
             else if (activity.activity_type === 3) {
-                return <DirectEventContractComplete/>
+                return <DirectEventComplete contract={activity.contract}/>
             }
             else if (activity.activity_type === 4) {
                 return <DirectEventExpired />
@@ -37,7 +37,7 @@ const Direct = () => {
 
         <div className="flex flex-col h-screen w-screen items-center">
 
-            <Title title="Direct" description="Send Direcly" />
+            <Title title="Activity" description="Your Recent Actions" />
 
             <div className="flex flex-col flex-grow bottom-animation w-[75vw] lg:w-[50vw] mt-5 gap-4">
 
