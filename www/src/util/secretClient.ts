@@ -131,5 +131,5 @@ export const query_activity = async () => {
   
   console.log("Fetched Acitivity", my_query)
 
-  return my_query.contracts
+  return my_query
 };

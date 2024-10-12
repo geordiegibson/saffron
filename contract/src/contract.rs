@@ -9,7 +9,7 @@ use secret_toolkit::permit::Permit;
 
 use crate::msg::{ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
-use crate::state::{config, config_read, ActivityType, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
+use crate::state::{config, config_read, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 
 pub const SEED_LEN: usize = 32;
@@ -66,8 +66,6 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
 
 pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, from: Addr, amount: Uint128, msg: Option<Binary>) -> StdResult<Response> {
     
-    deps.api.debug("callback called");
-
     let mut res = Response::default();
     let secret = SNIP52_INTERNAL_SECRET.load(deps.storage)?;
     let secret = secret.as_slice();
@@ -78,12 +76,13 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
             ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
                 deps.api.debug("Received Create Request");
                 
-                let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(info.sender.to_string().as_bytes());
-                let result = user_count_store.insert(deps.storage, &1, &1);
-
-                deps.api.debug(&format!("{:?}", result));
+                // Add "Create Activity" to users account
+                let state = config(deps.storage).load().unwrap();
+                let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
+                let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &1);
 
                 config(deps.storage).update::<_, StdError>(|mut state| {
+                    
                     let contract = Contract {
                         id: state.current_contract_id.to_string(),
                         user_wallet_address: sender.to_string(),
@@ -93,6 +92,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                         wanting_amount: wanting_amount,
                         expiration: String::new(),
                     };
+
                     state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
                     state.contracts.push(contract);
 
@@ -102,12 +102,21 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
 
             ExecuteReceiveMsg::Accept { id } => {
                 deps.api.debug("Received Accept Request");
-                                
-                config(deps.storage).update::<_, StdError>(|mut state| {
 
-                    let contract = state.contracts.iter().find(|&contract| contract.id == id).unwrap();
+                let state = config(deps.storage).load().unwrap();
+                let contract = state.contracts.iter().find(|&contract| contract.id == id).unwrap();
 
-                    if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
+                if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
+
+                    // Add "Accept Activity" to accepters account
+                    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
+                    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &2);
+
+                    // Add "User Accepted Your Contract Activity" to original users account
+                    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
+                    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &3);
+
+                    config(deps.storage).update::<_, StdError>(|mut state| {
 
                         // Valid Acceptance. Send the currencies to each person and delete the contract.
                         deps.api.debug("Valid Accept Request");
@@ -152,11 +161,11 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                         state.contracts.retain(|contract| contract.id != id);
 
                         Ok(state)
-                    } else {
-                        deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
-                        Ok(state)
-                    }
-                })?;
+                    })?;
+
+                } else {
+                    deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
+                }
             }
         }
     }
@@ -265,22 +274,16 @@ fn query_channel_info(
 }
 
 fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
+
     let mut activities: Vec<u32> = Vec::new();
     let keymap_with_suffix = USER_ACTIVITIES_KEYMAP.add_suffix(user_address.as_bytes());
 
-    deps.api.debug(&format!("Total Length {:?}", USER_ACTIVITIES_KEYMAP.get_len(deps.storage)));
-
-    // Collect the results
     let iter = keymap_with_suffix.iter(deps.storage)?;
-    let (len, _) = iter.size_hint();
 
-    deps.api.debug(&format!("Activity length after query {:?}", len));
-
-    // Collect only the second element (ActivityType) from the Results
     for entry in iter {
         match entry {
-            Ok((id, activity)) => {
-                activities.push(activity); // push the ActivityType into the vector
+            Ok((_, activity)) => {
+                activities.push(activity);
             }
             Err(err) => {
                 deps.api.debug(&format!("Error fetching activity: {:?}", err));
