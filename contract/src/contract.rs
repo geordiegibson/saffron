@@ -1,4 +1,6 @@
 
+use std::str::FromStr;
+
 use cosmwasm_std::{from_binary, Addr, CanonicalAddr, Uint128, Uint64};
 use cosmwasm_std::{
     entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
@@ -9,7 +11,7 @@ use secret_toolkit::permit::Permit;
 
 use crate::msg::{Activity, ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
-use crate::state::{config, config_read, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
+use crate::state::{config, ClientContract, Contract, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 
 pub const SEED_LEN: usize = 32;
@@ -19,12 +21,10 @@ pub fn instantiate(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    msg: InstantiateMsg,
+    _msg: InstantiateMsg,
 ) -> StdResult<Response> {
     let state = State {
         current_contract_id: Uint128::new(0),
-        contracts: Vec::new(),
-        expired_contracts: Vec::new(),
         owner: info.sender.clone(),
     };
 
@@ -65,7 +65,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     }
 }
 
-pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, from: Addr, amount: Uint128, msg: Option<Binary>) -> StdResult<Response> {
+pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _from: Addr, amount: Uint128, msg: Option<Binary>) -> StdResult<Response> {
     
     let mut res = Response::default();
     let secret = SNIP52_INTERNAL_SECRET.load(deps.storage)?;
@@ -82,31 +82,30 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                 let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
                 let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &1);
 
+                let contract = Contract {
+                    id: state.current_contract_id,
+                    user_wallet_address: sender.to_string(),
+                    offering_coin_addr: info.sender.to_string(), 
+                    offering_amount: amount,
+                    wanting_coin_addr: wanting_coin_addr,
+                    wanting_amount: wanting_amount,
+                    expiration: String::new(),
+                };
+
                 config(deps.storage).update::<_, StdError>(|mut state| {
-                    
-                    let contract = Contract {
-                        id: state.current_contract_id,
-                        user_wallet_address: sender.to_string(),
-                        offering_coin_addr: info.sender.to_string(), 
-                        offering_amount: amount,
-                        wanting_coin_addr: wanting_coin_addr,
-                        wanting_amount: wanting_amount,
-                        expiration: String::new(),
-                    };
-
                     state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
-                    state.contracts.push(contract);
-
                     Ok(state)
                 })?;
+
+                let _ = ACTIVE_CONTRACTS_KEYMAP.insert(deps.storage, &state.current_contract_id, &contract);
             },
 
             ExecuteReceiveMsg::Accept { id } => {
-                deps.api.debug("Received Accept Request");
+                deps.api.debug("Valid Accept Request");
 
-                let state = config(deps.storage).load().unwrap();
-                let contract = state.contracts.iter().find(|&contract| contract.id.u128().to_string() == id).unwrap();
+                let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &Uint128::from_str(&id).unwrap()).unwrap();
 
+                // Ensure the sent money matches the requirements to fulfill the trade
                 if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
 
                     // Add "Accept Activity" to accepters account
@@ -115,58 +114,49 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
 
                     // Add "User Accepted Your Contract Activity" to original users account
                     let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
-                    let _ = user_count_store.insert(deps.storage, &contract.id, &3);
+                    let _ = user_count_store.insert(deps.storage, &contract.id, &3);    
 
-                    config(deps.storage).update::<_, StdError>(|mut state| {
+                    // Send inital currency to the user who accepted the contract
+                    let acceptance_transfer_message = transfer_msg(sender.to_string(),
+                        contract.offering_amount,
+                        None,
+                        None, 
+                        256,
+                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                        contract.offering_coin_addr.to_string(),
+                    )?;
 
-                        // Valid Acceptance. Send the currencies to each person and delete the contract.
-                        deps.api.debug("Valid Accept Request");
+                    // Send the given money to the user who created the contract.
+                    let intial_transfer_message = transfer_msg(contract.user_wallet_address.to_string(),
+                        contract.wanting_amount,
+                        None,
+                        None, 
+                        256,
+                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                        contract.wanting_coin_addr.to_string(),
+                    )?;
 
-                        let intial_transfer_message = transfer_msg(sender.to_string(),
-                            contract.offering_amount,
-                            None,
-                            None, 
-                            256,
-                            "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
-                            contract.offering_coin_addr.to_string(),
-                        )?;
-                        deps.api.debug(&format!("Initial Transfer Message {:?}", intial_transfer_message));
-
-                        let acceptance_transfer_message = transfer_msg(contract.user_wallet_address.to_string(),
-                            contract.wanting_amount,
-                            None,
-                            None, 
-                            256,
-                            "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
-                            contract.wanting_coin_addr.to_string(),
-                        )?;
-                        deps.api.debug(&format!("Acceptance Transfer Message {:?}", acceptance_transfer_message));
-
-                        // SNIP-52 add `accepted` push notification
-                        let notification = Notification::new(
-                            Addr::unchecked(contract.user_wallet_address.clone()),
-                            AcceptedNotificationData {
-                                id: id.clone(),
-                            }
-                        )
-                        .to_txhash_notification(deps.api, &env, secret, None)?;
-
-                        // Expire the contract
-                        if let Some(pos) = state.contracts.iter().position(|contract| contract.id.u128().to_string() == id) {
-                            let contract = state.contracts.swap_remove(pos);
-                            state.expired_contracts.push(contract);
+                    // SNIP-52 add `accepted` push notification
+                    let notification = Notification::new(
+                        Addr::unchecked(contract.user_wallet_address.clone()),
+                        AcceptedNotificationData {
+                            id: id.clone(),
                         }
+                    )
+                    .to_txhash_notification(deps.api, &env, secret, None)?;
 
-                        res = Response::default()
-                            .add_message(intial_transfer_message)
-                            .add_message(acceptance_transfer_message)
-                            .add_attribute_plaintext(
-                                notification.id_plaintext(),
-                                notification.data_plaintext(),
-                        );
+                    // Expire the contract
+                    let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &Uint128::from_str(&id).unwrap()).unwrap();
+                    let _ = ACTIVE_CONTRACTS_KEYMAP.remove(deps.storage, &Uint128::from_str(&id).unwrap());
+                    let _ = EXPIRED_CONTRACTS_KEYMAP.insert(deps.storage, &contract.id, &contract);
 
-                        Ok(state)
-                    })?;
+                    res = Response::default()
+                        .add_message(intial_transfer_message)
+                        .add_message(acceptance_transfer_message)
+                        .add_attribute_plaintext(
+                            notification.id_plaintext(),
+                            notification.data_plaintext(),
+                    );
 
                 } else {
                     deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
@@ -184,9 +174,6 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::GetContracts {} => to_binary(&query_contracts(deps)?),
         QueryMsg::GetActivity { user_address } => to_binary(&query_activity(deps, user_address)?),
         QueryMsg::WithPermit { permit, query } => permit_queries(deps, env, permit, query),
-        _ => {
-            return Err(StdError::generic_err("Bad"));
-        }
     }
 }
 
@@ -219,9 +206,14 @@ fn permit_queries(
 }
 
 fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
-    let state = config_read(deps.storage).load()?;
-    let client_contracts: Vec<ClientContract> = state.contracts.into_iter().map(ClientContract::from).collect();
-    Ok(ContractsResponse { contracts: client_contracts })
+    
+    let client_contracts: Vec<ClientContract> = ACTIVE_CONTRACTS_KEYMAP.iter(deps.storage)?.map(|item| {
+            let (_, contract) = item?;
+            Ok(ClientContract::from(contract))
+        })
+        .collect::<StdResult<Vec<ClientContract>>>()?;
+
+   Ok(ContractsResponse { contracts: client_contracts })
 }
 
 ///
@@ -288,31 +280,12 @@ fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityRespons
     for entry in iter {
         match entry {
             Ok((id, activity)) => {
-
-                let state = config_read(deps.storage).load()?;
-
-                deps.api.debug(&format!("Live Contracts {:?}", state.contracts));
-
-                deps.api.debug(&format!("Expired Contracts {:?}", state.expired_contracts));
-
-                let contract = state.contracts
-                    .iter()
-                    .find(|contract| contract.id == id);
                 
-                deps.api.debug(&format!("Contract found {:?}", contract));
-
-                let test = state.expired_contracts
-                    .iter()
-                    .find(|contract| contract.id == id);
-
-                deps.api.debug(&format!("Test found {:?}", test));
-
+                let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &id);
 
                 let contract = match contract {
                     Some(contract) => Some(contract),
-                    None => state.expired_contracts
-                                .iter()
-                                .find(|contract| contract.id == id),
+                    None => EXPIRED_CONTRACTS_KEYMAP.get(deps.storage, &id)
                 };
 
                 if contract.is_some() {

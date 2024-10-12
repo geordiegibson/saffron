@@ -74,7 +74,7 @@ export let create_contract = async (contract: Contract) => {
       msg: executeMsg,
     },
     {
-      gasLimit: 200_000,
+      gasLimit: 100_000,
     }
   );
   
