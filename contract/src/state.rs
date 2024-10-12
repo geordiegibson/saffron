@@ -12,7 +12,7 @@ pub static USER_ACTIVITIES_KEYMAP: Keymap<Uint128, u32> = Keymap::new(b"user_act
 // Complete contract details stored on the server.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Contract {
-    pub id: String,
+    pub id: Uint128,
     pub user_wallet_address: String,
     pub offering_coin_addr: String,
     pub offering_amount: Uint128,
@@ -24,7 +24,7 @@ pub struct Contract {
 // Client representation of a contract. user_wallet_address field removed to keep contracts anonymous.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ClientContract {
-    pub id: String,
+    pub id: Uint128,
     pub offering_coin_addr: String,
     pub offering_amount: Uint128,
     pub wanting_coin_addr: String,
@@ -46,19 +46,17 @@ impl From<Contract> for ClientContract {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
-pub enum ActivityType {
-    CreatedContract,
-    AcceptedContract,
-    ContractAcceptedByOthers,
-    ExpiredContract,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct UserActivity {
-    pub event_type: ActivityType,
-    pub contract_id: String,
-    pub timestamp: String,
+impl From<&Contract> for ClientContract {
+    fn from(contract: &Contract) -> Self {
+        ClientContract {
+            id: contract.id.clone(),
+            offering_coin_addr: contract.offering_coin_addr.clone(),
+            offering_amount: contract.offering_amount,
+            wanting_coin_addr: contract.wanting_coin_addr.clone(),
+            wanting_amount: contract.wanting_amount,
+            expiration: contract.expiration.clone(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
@@ -66,6 +64,7 @@ pub struct State {
     pub owner: Addr,
     pub current_contract_id: Uint128,
     pub contracts: Vec<Contract>,
+    pub expired_contracts: Vec<Contract>
 }
 
 pub fn config(storage: &mut dyn Storage) -> Singleton<State> {

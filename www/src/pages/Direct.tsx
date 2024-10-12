@@ -17,17 +17,17 @@ const Direct = () => {
     }, []);
 
     const displayActivities = () => {
-        return activities.map((activity: number) => {
-            if (activity === 1) {
-                return <DirectEventCreated />
+        return activities.map((activity: any) => {
+            if (activity.activity_type === 1) {
+                return <DirectEventCreated contract={activity.contract}/>
             }
-            else if (activity === 2) {
+            else if (activity.activity_type === 2) {
                 return <DirectEventAccepted />
             }
-            else if (activity === 3) {
+            else if (activity.activity_type === 3) {
                 return <DirectEventContractComplete/>
             }
-            else if (activity === 4) {
+            else if (activity.activity_type === 4) {
                 return <DirectEventExpired />
             }
         })

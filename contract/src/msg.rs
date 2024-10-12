@@ -2,7 +2,7 @@ use cosmwasm_std::{Addr, Binary, Uint128, Uint64};
 use schemars::JsonSchema;
 use secret_toolkit::{notification::ChannelInfoData, permit::Permit};
 use serde::{Deserialize, Serialize};
-use crate::state::{ActivityType, ClientContract};
+use crate::state::ClientContract;
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -71,6 +71,12 @@ pub struct ContractsResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct Activity {
+    pub activity_type: u32,
+    pub contract: ClientContract
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ActivityResponse {
-    pub activity: Vec<u32>
+    pub activity: Vec<Activity>
 }

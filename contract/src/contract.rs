@@ -7,7 +7,7 @@ use secret_toolkit::crypto::{hkdf_sha_256, sha_256, ContractPrng};
 use secret_toolkit::notification::{get_seed, notification_id, ChannelInfoData, Notification, NotificationData};
 use secret_toolkit::permit::Permit;
 
-use crate::msg::{ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
+use crate::msg::{Activity, ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
 use crate::state::{config, config_read, ClientContract, Contract, State, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
@@ -24,6 +24,7 @@ pub fn instantiate(
     let state = State {
         current_contract_id: Uint128::new(0),
         contracts: Vec::new(),
+        expired_contracts: Vec::new(),
         owner: info.sender.clone(),
     };
 
@@ -84,7 +85,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     
                     let contract = Contract {
-                        id: state.current_contract_id.to_string(),
+                        id: state.current_contract_id,
                         user_wallet_address: sender.to_string(),
                         offering_coin_addr: info.sender.to_string(), 
                         offering_amount: amount,
@@ -104,17 +105,17 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                 deps.api.debug("Received Accept Request");
 
                 let state = config(deps.storage).load().unwrap();
-                let contract = state.contracts.iter().find(|&contract| contract.id == id).unwrap();
+                let contract = state.contracts.iter().find(|&contract| contract.id.u128().to_string() == id).unwrap();
 
                 if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
 
                     // Add "Accept Activity" to accepters account
                     let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
-                    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &2);
+                    let _ = user_count_store.insert(deps.storage, &contract.id, &2);
 
                     // Add "User Accepted Your Contract Activity" to original users account
                     let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
-                    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &3);
+                    let _ = user_count_store.insert(deps.storage, &contract.id, &3);
 
                     config(deps.storage).update::<_, StdError>(|mut state| {
 
@@ -150,15 +151,19 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                         )
                         .to_txhash_notification(deps.api, &env, secret, None)?;
 
+                        // Expire the contract
+                        if let Some(pos) = state.contracts.iter().position(|contract| contract.id.u128().to_string() == id) {
+                            let contract = state.contracts.swap_remove(pos);
+                            state.expired_contracts.push(contract);
+                        }
+
                         res = Response::default()
                             .add_message(intial_transfer_message)
                             .add_message(acceptance_transfer_message)
                             .add_attribute_plaintext(
                                 notification.id_plaintext(),
                                 notification.data_plaintext(),
-                            );
-                        
-                        state.contracts.retain(|contract| contract.id != id);
+                        );
 
                         Ok(state)
                     })?;
@@ -275,15 +280,50 @@ fn query_channel_info(
 
 fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
 
-    let mut activities: Vec<u32> = Vec::new();
+    let mut activities: Vec<Activity> = Vec::new();
     let keymap_with_suffix = USER_ACTIVITIES_KEYMAP.add_suffix(user_address.as_bytes());
 
     let iter = keymap_with_suffix.iter(deps.storage)?;
 
     for entry in iter {
         match entry {
-            Ok((_, activity)) => {
-                activities.push(activity);
+            Ok((id, activity)) => {
+
+                let state = config_read(deps.storage).load()?;
+
+                deps.api.debug(&format!("Live Contracts {:?}", state.contracts));
+
+                deps.api.debug(&format!("Expired Contracts {:?}", state.expired_contracts));
+
+                let contract = state.contracts
+                    .iter()
+                    .find(|contract| contract.id == id);
+                
+                deps.api.debug(&format!("Contract found {:?}", contract));
+
+                let test = state.expired_contracts
+                    .iter()
+                    .find(|contract| contract.id == id);
+
+                deps.api.debug(&format!("Test found {:?}", test));
+
+
+                let contract = match contract {
+                    Some(contract) => Some(contract),
+                    None => state.expired_contracts
+                                .iter()
+                                .find(|contract| contract.id == id),
+                };
+
+                if contract.is_some() {
+                    let activity = Activity {
+                        activity_type: activity,
+                        contract: contract.unwrap().into()
+                    };
+    
+                    activities.push(activity);
+                }
+                
             }
             Err(err) => {
                 deps.api.debug(&format!("Error fetching activity: {:?}", err));
