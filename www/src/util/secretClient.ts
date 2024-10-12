@@ -117,3 +117,19 @@ export let accept_contract = async (contract: Contract) => {
   console.log(tx)
   return tx
 };
+
+export const query_activity = async () => {
+  
+  let client = await createQueryClient();
+  let address = await getWalletAddress();
+  console.log(address)
+  const my_query = await client.query.compute.queryContract({
+    contract_address: import.meta.env.VITE_contractAddress as string,
+    code_hash: import.meta.env.VITE_contractCodeHash,
+    query: { get_activity: { user_address: address} },
+  });
+  
+  console.log("Fetched Acitivity", my_query)
+
+  return my_query
+};

@@ -2,7 +2,7 @@ use cosmwasm_std::{Addr, Binary, Uint128, Uint64};
 use schemars::JsonSchema;
 use secret_toolkit::{notification::ChannelInfoData, permit::Permit};
 use serde::{Deserialize, Serialize};
-use crate::state::ClientContract;
+use crate::state::{ActivityType, ClientContract};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -35,6 +35,7 @@ pub enum ExecuteReceiveMsg {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     GetContracts {},
+    GetActivity { user_address: String },
     WithPermit {
         permit: Permit,
         query: QueryWithPermit,
@@ -67,4 +68,9 @@ pub enum QueryAnswer {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ContractsResponse {
     pub contracts: Vec<ClientContract>
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct ActivityResponse {
+    pub activity: Vec<u32>
 }
