@@ -35,7 +35,7 @@ pub enum ExecuteReceiveMsg {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     GetContracts {},
-    GetActivity { user_address: String},
+    GetActivity { user_address: String },
     WithPermit {
         permit: Permit,
         query: QueryWithPermit,
@@ -72,5 +72,5 @@ pub struct ContractsResponse {
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ActivityResponse {
-    pub activity: Vec<ActivityType>
+    pub activity: Vec<u32>
 }

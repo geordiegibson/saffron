@@ -3,6 +3,7 @@ import Title from "../components/common/Title";
 import DirectEventAccepted from "../components/direct/DirectEventAccepted";
 import DirectEventCreated from "../components/direct/DirectEventCreated";
 import DirectEventExpired from "../components/direct/DirectEventExpired";
+import { query_activity } from "../util/secretClient";
 
 const Direct = () => {
 
@@ -23,6 +24,8 @@ const Direct = () => {
                 {/* <NoResults icon={<i className="bi bi-people-fill"></i>} title="No Activity" description="Get started by viewing available trades." /> */}
             
             </div>
+
+            <button className="p-3 bg-white rounded-xl" onClick={() => query_activity()}>Get Activity</button>
 
             <Menu page="direct" />
         </div>

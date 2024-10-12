@@ -38,13 +38,6 @@ pub fn instantiate(
         "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v".to_string(),
     )?;
 
-    // User Activity init
-    let initial_user_address = info.sender.to_string();
-    let initial_activities: Vec<ActivityType> = Vec::new(); // Start with an empty list for the user
-
-    USER_ACTIVITIES_KEYMAP.insert(deps.storage, &initial_user_address, &initial_activities)?;
-
-
     // SNIP-52 init
     // create an internal secret
     let rng_seed = env.block.random.as_ref().unwrap();
@@ -56,6 +49,7 @@ pub fn instantiate(
         "contract_internal_secret".as_bytes(),
         SEED_LEN,
     )?;
+
     SNIP52_INTERNAL_SECRET.save(deps.storage, &internal_secret)?;
 
     Ok(Response::new()
@@ -83,8 +77,9 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
 
             ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
                 deps.api.debug("Received Create Request");
-
-                let mut activities: Vec<ActivityType> = USER_ACTIVITIES_KEYMAP.get(deps.storage, &info.sender.to_string()).unwrap_or_default();
+                
+                let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(info.sender.to_string().as_bytes());
+                let result = user_count_store.insert(deps.storage, &1, &1);
 
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
@@ -98,8 +93,6 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                     };
                     state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
                     state.contracts.push(contract);
-
-                    activities.push(ActivityType::CreatedContract);
 
                     Ok(state)
                 })?;
@@ -175,6 +168,9 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::GetContracts {} => to_binary(&query_contracts(deps)?),
         QueryMsg::GetActivity { user_address } => to_binary(&query_activity(deps, user_address)?),
         QueryMsg::WithPermit { permit, query } => permit_queries(deps, env, permit, query),
+        _ => {
+            return Err(StdError::generic_err("Bad"));
+        }
     }
 }
 
@@ -266,11 +262,29 @@ fn query_channel_info(
     })
 }
 
-pub fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
+fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
+    let mut activities: Vec<u32> = Vec::new();
+    let keymap_with_suffix = USER_ACTIVITIES_KEYMAP.add_suffix(user_address.as_bytes());
 
-    let user_activity: Vec<ActivityType> = USER_ACTIVITIES_KEYMAP
-        .get(deps.storage, &user_address)
-        .unwrap_or_default();
+    deps.api.debug(&format!("Total Length {:?}", USER_ACTIVITIES_KEYMAP.get_len(deps.storage)));
 
-    Ok(ActivityResponse { activity: user_activity })
+    // Collect the results
+    let iter = keymap_with_suffix.iter(deps.storage)?;
+    let (len, _) = iter.size_hint();
+
+    deps.api.debug(&format!("Activity length after query {:?}", len));
+
+    // Collect only the second element (ActivityType) from the Results
+    for entry in iter {
+        match entry {
+            Ok((id, activity)) => {
+                activities.push(activity); // push the ActivityType into the vector
+            }
+            Err(err) => {
+                deps.api.debug(&format!("Error fetching activity: {:?}", err));
+            }
+        }
+    }
+
+    Ok(ActivityResponse { activity: activities })
 }

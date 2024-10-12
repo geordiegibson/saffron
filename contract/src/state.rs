@@ -7,7 +7,7 @@ use cosmwasm_std::{Addr, Storage, Uint128};
 use cosmwasm_storage::{singleton, singleton_read, ReadonlySingleton, Singleton};
 
 pub static CONFIG_KEY: &[u8] = b"config";
-pub static USER_ACTIVITIES_KEYMAP: Keymap<String, Vec<ActivityType>> = Keymap::new(b"user_activities");
+pub static USER_ACTIVITIES_KEYMAP: Keymap<u32, u32> = Keymap::new(b"user_activities");
 
 // Complete contract details stored on the server.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
@@ -65,7 +65,7 @@ pub struct UserActivity {
 pub struct State {
     pub owner: Addr,
     pub current_contract_id: Uint128,
-    pub contracts: Vec<Contract>
+    pub contracts: Vec<Contract>,
 }
 
 pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
