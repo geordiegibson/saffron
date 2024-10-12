@@ -81,6 +81,8 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, fro
                 let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(info.sender.to_string().as_bytes());
                 let result = user_count_store.insert(deps.storage, &1, &1);
 
+                deps.api.debug(&format!("{:?}", result));
+
                 config(deps.storage).update::<_, StdError>(|mut state| {
                     let contract = Contract {
                         id: state.current_contract_id.to_string(),
