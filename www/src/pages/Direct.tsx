@@ -17,7 +17,10 @@ const Direct = () => {
     }, []);
 
     const displayActivities = () => {
-        return activities.map((activity: any) => {
+
+        const recentActivities = activities.slice(-5).reverse(); 
+
+        return recentActivities.map((activity: any) => {
             if (activity.activity_type === 1) {
                 return <DirectEventCreated contract={activity.contract}/>
             }
