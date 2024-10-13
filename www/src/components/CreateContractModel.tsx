@@ -84,16 +84,8 @@ const CreateContractModel = (props: any) => {
           <div className="mb-[15px] flex flex-col gap-1 mt-5">
             <div className='flex gap-2 items-center'>
               <input ref={checkboxRef} onChange={() => setIsNFT((prev) => !prev)} type="checkbox" className="h-5 w-5 bg-zinc-800 rounded text-gray-700" style={{ boxShadow: "none" }} />
-              
               <p className='text-white leading-none text-sm'>Offering an NFT instead of a Coin?</p>
-              
             </div>
-            {/* <div>
-              <label>
-                <input type="checkbox" checked={isNFT} onChange={() => setIsNFT(!isNFT)} />
-                Offering an NFT instead of a Coin?
-              </label>
-            </div> */}
             <label className="text-gray-400 w-[90px] text-left font-bold w-full text-xs" htmlFor="name">You Give</label>
             {!isNFT ? (
                 <CryptoInput
