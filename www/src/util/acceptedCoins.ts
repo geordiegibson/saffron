@@ -2,8 +2,8 @@ const secret: Coin = {
     name: "Secret",
     abbr: "SCRT",
     img: "images/SCRT.png",
-    address: "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v",
-    hash: "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257"
+    address: "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf",
+    hash: "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe"
 }
 
 const ethereum: Coin = {

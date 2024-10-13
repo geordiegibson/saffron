@@ -35,8 +35,8 @@ pub fn instantiate(
         env.contract.code_hash.clone(), 
         None, 
         256, 
-        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
-        "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v".to_string(),
+        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
+        "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf".to_string(),
     )?;
 
     // SNIP-52 init
@@ -122,7 +122,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                         None,
                         None, 
                         256,
-                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
                         contract.offering_coin_addr.to_string(),
                     )?;
 
@@ -132,7 +132,8 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                         None,
                         None, 
                         256,
-                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                        // 3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257
+                        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
                         contract.wanting_coin_addr.to_string(),
                     )?;
 
