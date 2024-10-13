@@ -87,9 +87,9 @@ const TradeItem = (props: {contract: Contract}) => {
             <div className='flex flex-row justify-between w-full mt-6'>
                 <div className='flex-col justify-start items-center'>
                     <p className='text-neutral-400 text-sm'>You receive:</p>
-                    <p className='font-bold text-white'>{props.contract.offering_amount} {offeringCoin?.abbr}</p>
+                    <p className='font-bold text-white'>{props.contract.offering_amount || "NFT: " + props.contract.token_id} {offeringCoin?.abbr || ""}</p>
                 </div>
-                <img className='h-10' src={offeringCoin?.img} />
+                <img className='h-10' src={offeringCoin?.img || props.contract.token_url} />
             </div>
 
 

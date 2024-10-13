@@ -13,22 +13,26 @@ pub static CONFIG_KEY: &[u8] = b"config";
 pub struct Contract {
     pub id: Uint128,
     pub user_wallet_address: String,
-    pub offering_coin_addr: String,
-    pub offering_amount: Uint128,
+    pub offering_coin_addr: Option<String>, 
+    pub offering_amount: Option<Uint128>,
     pub wanting_coin_addr: String,
     pub wanting_amount: Uint128,
-    pub expiration: String
+    pub expiration: String,
+    pub token_id: Option<String>,
+    pub token_url: Option<String>, 
 }
 
 // Client representation of a contract. user_wallet_address field removed to keep contracts anonymous.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ClientContract {
     pub id: Uint128,
-    pub offering_coin_addr: String,
-    pub offering_amount: Uint128,
+    pub offering_coin_addr: Option<String>, // Make offering_coin_addr optional
+    pub offering_amount: Option<Uint128>, // Make offering_amount optional
     pub wanting_coin_addr: String,
     pub wanting_amount: Uint128,
-    pub expiration: String
+    pub expiration: String,
+    pub token_id: Option<String>, // Optional token_id field
+    pub token_url: Option<String>, // Optional token_url field
 }
 
 // Allows us to convert from Contract type to ClientContract type.
@@ -41,6 +45,8 @@ impl From<Contract> for ClientContract {
             wanting_coin_addr: contract.wanting_coin_addr,
             wanting_amount: contract.wanting_amount,
             expiration: contract.expiration,
+            token_id: contract.token_id,
+            token_url: contract.token_url,
         }
     }
 }
@@ -54,6 +60,8 @@ impl From<&Contract> for ClientContract {
             wanting_coin_addr: contract.wanting_coin_addr.clone(),
             wanting_amount: contract.wanting_amount,
             expiration: contract.expiration.clone(),
+            token_id: contract.token_id.clone(),
+            token_url: contract.token_url.clone(),
         }
     }
 }

@@ -30,6 +30,11 @@ pub enum ExecuteReceiveMsg {
         wanting_coin_addr: String,
         wanting_amount: Uint128,
     },
+    CreateNft {
+        wanting_coin_addr: String,
+        wanting_amount: Uint128,
+        token_url: String,
+    },
     Accept {
         id: String
     }

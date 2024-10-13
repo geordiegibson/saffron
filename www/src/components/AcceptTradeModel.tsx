@@ -73,14 +73,18 @@ const AcceptTradeModel = (props: any) => {
           </div>
 
         <div className="mt-3 flex flex-col gap-1">
-              <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">You Receive:</label>
-              <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
-                  <div className='flex w-full justify-between items-center'>
-                      <p className='font-bold text-white text-sm'>{props.contract.offering_amount} {offeringCoin?.abbr}</p>
-                      <img src={offeringCoin?.img} className='h-6'/>
-                  </div>
-              </span>
+        <label className="text-gray-400 w-[90px] font-bold text-left w-full text-xs" htmlFor="name">
+          You Receive:
+        </label>
+        <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
+          <div className='flex w-full justify-between items-center'>
+            <p className='font-bold text-white text-sm'>
+              {props.contract.offering_amount || props.contract.token_id} {offeringCoin?.abbr || ""}
+            </p>
+            {offeringCoin?.img && <img src={offeringCoin.img || props.contract.token_url} className='h-6' alt="Offering Coin" />}
           </div>
+        </span>
+      </div>
 
 
           <div className='mt-8 flex justify-between items-center'>
