@@ -56,6 +56,7 @@ const CreateContractModel = (props: any) => {
     
     console.log(contract)
     create_contract(contract).then((response) => {
+      console.log(response)
       if (response.code == 0) {
         setModalState(ModalState.SUCCESS)
       } else {

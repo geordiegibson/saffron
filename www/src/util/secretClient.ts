@@ -1,5 +1,5 @@
 import { SecretNetworkClient } from "secretjs";
-import {getCoinByAddr} from "./acceptedCoins";
+import {getCoinByAddr, nftCollection} from "./acceptedCoins";
 import { getSigner, getWalletAddress, getEncryptionUtil} from './keplr'
 
 
@@ -57,16 +57,14 @@ export const try_query_contracts = async () => {
 
 // Attempt to create a contract by sending currency to the escrow with information surronding what you want in return.
 export let create_contract = async (contract: Contract) => {
-  if (instanceOfCoinContract(contract)) {
-    let client = await createExecuteClient();
-
-    let request = {
+  const client = await createExecuteClient();
+  const request = {
         create: {
           wanting_coin_addr: contract.wanting_coin_addr,
           wanting_amount: contract.wanting_amount.toString()
         }
     }
-    
+  if (instanceOfCoinContract(contract)) {
     let executeMsg = {
       send: {
         owner: await getWalletAddress(),
@@ -91,11 +89,30 @@ export let create_contract = async (contract: Contract) => {
     console.log(tx)
     return tx
   } else if (instanceOfNFTContract(contract)) {
-    console.log("wahey")
+    let executeMsg = {
+      send_nft: {
+        token_id: contract.nft_addr.toString(),
+        contract: import.meta.env.VITE_contractAddress,
+        msg: btoa(JSON.stringify(request))
+      },
+    };
+
+    let tx = await client.tx.compute.executeContract(
+      {
+        sender: await getWalletAddress(),
+        contract_address: nftCollection.address,
+        code_hash: nftCollection.hash,
+        msg: executeMsg,
+      },
+      {
+        gasLimit: 100_000,
+      }
+    );
+    console.log(tx)
+    return tx
   } else {
     console.log("what happened?")
   }
-  
 };
 
 // Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.

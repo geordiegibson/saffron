@@ -27,3 +27,16 @@ export const supportedCoins = [secret, ethereum, shade]
 export function getCoinByAddr(address: string): Coin | undefined {
     return supportedCoins.find(coin => coin.address === address);
 }
+
+
+export const nftCollection: NFT = {
+    name: "nft",
+    address: "secret1j9s8zvvjzd7v6asf4wppvhphv52szxd25fh0mp",
+    hash: "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8"
+}
+
+// const supportedNFTs = [nft]
+
+// export function getNFTCollectionByAddr(address: string): NFT | undefined {
+//     return supportedNFTs.find(nft => nft.address === address);
+// }

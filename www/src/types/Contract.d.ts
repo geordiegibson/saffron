@@ -17,10 +17,16 @@ interface NFTContract extends Contract {
 
 type Coin = {
     address: string,
-    hash: string
+    hash: string,
     name: string,
     abbr: string,
     img: string
+}
+
+type NFT = {
+    address: string,
+    hash: string,
+    name: string
 }
 
 type Filters = {
