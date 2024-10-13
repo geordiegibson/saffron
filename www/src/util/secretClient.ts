@@ -2,6 +2,16 @@ import { SecretNetworkClient } from "secretjs";
 import {getCoinByAddr} from "./acceptedCoins";
 import { getSigner, getWalletAddress, getEncryptionUtil} from './keplr'
 
+
+function instanceOfCoinContract(object: any): object is CoinContract { 
+    return 'offering_coin_addr' in object; 
+} 
+
+function instanceOfNFTContract(object: any): object is NFTContract { 
+    return 'nft_addr' in object; 
+} 
+
+
 // SecretJS Client to perform query messages. Does not require a connected wallet.
 const createQueryClient = async () => {
 
@@ -47,39 +57,45 @@ export const try_query_contracts = async () => {
 
 // Attempt to create a contract by sending currency to the escrow with information surronding what you want in return.
 export let create_contract = async (contract: Contract) => {
+  if (instanceOfCoinContract(contract)) {
+    let client = await createExecuteClient();
 
-  let client = await createExecuteClient();
+    let request = {
+        create: {
+          wanting_coin_addr: contract.wanting_coin_addr,
+          wanting_amount: contract.wanting_amount.toString()
+        }
+    }
+    
+    let executeMsg = {
+      send: {
+        owner: await getWalletAddress(),
+        amount: contract.offering_amount.toString(),
+        recipient: import.meta.env.VITE_contractAddress,
+        msg: btoa(JSON.stringify(request))
+      },
+    };
 
-  let request = {
-      create: {
-        wanting_coin_addr: contract.wanting_coin_addr,
-        wanting_amount: contract.wanting_amount.toString()
+    let tx = await client.tx.compute.executeContract(
+      {
+        sender: await getWalletAddress(),
+        contract_address: contract.offering_coin_addr,
+        code_hash: getCoinByAddr(contract.offering_coin_addr)?.hash,
+        msg: executeMsg,
+      },
+      {
+        gasLimit: 100_000,
       }
+    );
+    
+    console.log(tx)
+    return tx
+  } else if (instanceOfNFTContract(contract)) {
+    console.log("wahey")
+  } else {
+    console.log("what happened?")
   }
   
-  let executeMsg = {
-    send: {
-      owner: await getWalletAddress(),
-      amount: contract.offering_amount.toString(),
-      recipient: import.meta.env.VITE_contractAddress,
-      msg: btoa(JSON.stringify(request))
-    },
-  };
-
-  let tx = await client.tx.compute.executeContract(
-    {
-      sender: await getWalletAddress(),
-      contract_address: contract.offering_coin_addr,
-      code_hash: getCoinByAddr(contract.offering_coin_addr)?.hash,
-      msg: executeMsg,
-    },
-    {
-      gasLimit: 100_000,
-    }
-  );
-  
-  console.log(tx)
-  return tx
 };
 
 // Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.

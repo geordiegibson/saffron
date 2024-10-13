@@ -1,10 +1,19 @@
 type Contract = {
     id: string | null,
-    offering_coin_addr: string,
-    offering_amount: number,
     wanting_coin_addr: string,
     wanting_amount: number
 }
+ 
+
+interface CoinContract extends Contract {
+    offering_coin_addr: string,
+    offering_amount: number
+}
+
+interface NFTContract extends Contract {
+    nft_addr: string
+}
+
 
 type Coin = {
     address: string,

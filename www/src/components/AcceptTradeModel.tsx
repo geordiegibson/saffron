@@ -33,7 +33,8 @@ const AcceptTradeModel = (props: any) => {
         } else {
           setModalState(ModalState.FAIL)
         }
-      }).catch(() => {
+      }).catch((error) => {
+        console.log(error)
         setModalState(ModalState.TIMEOUT);
       })
     } else {
