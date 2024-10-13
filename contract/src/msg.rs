@@ -15,6 +15,11 @@ pub enum ExecuteMsg {
         from: Addr,
         amount: Uint128,
         msg: Option<Binary>,
+    },
+    ReceiveNft {
+        sender: Addr,
+        token_id: String,
+        msg: Option<Binary>,
     }
 }
 
