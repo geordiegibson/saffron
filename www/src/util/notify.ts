@@ -1,6 +1,6 @@
 import {SecretContract, subscribe_snip52_channels} from '@solar-republic/neutrino';
 import { SecretNetworkClient } from 'secretjs';
-import { createExecuteClient } from './secretClient';
+import { createExecuteClient, createQueryClient } from './secretClient';
 
 const contractAddress = import.meta.env.VITE_contractAddress;
 
@@ -57,13 +57,30 @@ export async function notifyExample() {
 
     const contract = await SecretContract("http://localhost:1317", contractAddress);
 
-    await subscribe_snip52_channels("http://localhost:26657", contract, permit, {
+    let qclient = await createQueryClient();
+
+    const my_query: {contracts: Array<Contract>} = await client.query.compute.queryContract({
+      contract_address: import.meta.env.VITE_contractAddress as string,
+      code_hash: import.meta.env.VITE_contractCodeHash,
+      query: { with_permit: {
+        permit,
+        query: {
+            channel_info: {
+                channels: ["accepted"]
+            }
+        }
+      } },
+    });
+    console.log(my_query);
+
+    subscribe_snip52_channels("http://localhost:26657", contract, permit, {
         accepted(data: [string]) {
+            console.log("hello");
             const [accepted_id] = data;
 
             // you got a notification for accepted id, do something with it here.
             console.log(accepted_id);
         }
-    })
+    });
 }
 

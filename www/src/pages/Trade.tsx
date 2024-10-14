@@ -153,6 +153,9 @@ const Trade = () => {
             }
           />
         </div>
+
+        <button className="bg-white p-3" onClick={() => notifyExample()}>Listen for Noti</button>
+
                   
         {displayContracts.length > 0 ? (
           <>
@@ -170,8 +173,7 @@ const Trade = () => {
 
             </div>
 
-            <button className="bg-white p-3" onClick={() => notifyExample()}>Click</button>
-
+            
             {/* Pagination */}
             <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 rounded-xl">
               <button onClick={() => previousPage()} className="w-24 text-white p-3 text-xl rounded-xl"><i className="text-bold bi bi-arrow-left"></i></button>

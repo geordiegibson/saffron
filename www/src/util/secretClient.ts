@@ -3,7 +3,7 @@ import {getCoinByAddr} from "./acceptedCoins";
 import { getSigner, getWalletAddress, getEncryptionUtil} from './keplr'
 
 // SecretJS Client to perform query messages. Does not require a connected wallet.
-const createQueryClient = async () => {
+export const createQueryClient = async () => {
 
   let client: any = new SecretNetworkClient({
     chainId: "secretdev-1",
