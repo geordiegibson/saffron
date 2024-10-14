@@ -51,6 +51,7 @@ pub enum QueryWithPermit {
         channels: Vec<String>,
         txhash: Option<String>,
     },
+    
 }
 
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
