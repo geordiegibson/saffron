@@ -241,61 +241,6 @@ pub fn try_receive_nft(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr,
             },
 
             ExecuteReceiveMsg::Accept { id } => {deps.api.debug("Received NFT3");}
-            //     deps.api.debug("Valid Accept Request");
-
-            //     let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &Uint128::from_str(&id).unwrap()).unwrap();
-
-            //     // Ensure the sent money matches the requirements to fulfill the trade
-            //     if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
-
-            //         // Add "Accept Activity" to accepters account
-            //         let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
-            //         let _ = user_count_store.insert(deps.storage, &contract.id, &2);
-
-            //         // Add "User Accepted Your Contract Activity" to original users account
-            //         let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
-            //         let _ = user_count_store.insert(deps.storage, &contract.id, &3);    
-
-            //         // Send nft to the user who accepted the contract
-                    
-
-            //         // Send the given money to the user who created the contract.
-            //         let intial_transfer_message = transfer_msg(contract.user_wallet_address.to_string(),
-            //             contract.wanting_amount,
-            //             None,
-            //             None, 
-            //             256,
-            //             // 3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257
-            //             "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
-            //             contract.wanting_coin_addr.to_string(),
-            //         )?;
-
-            //         // SNIP-52 add `accepted` push notification
-            //         let notification = Notification::new(
-            //             Addr::unchecked(contract.user_wallet_address.clone()),
-            //             AcceptedNotificationData {
-            //                 id: id.clone(),
-            //             }
-            //         )
-            //         .to_txhash_notification(deps.api, &env, secret, None)?;
-
-            //         // Expire the contract
-            //         let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &Uint128::from_str(&id).unwrap()).unwrap();
-            //         let _ = ACTIVE_CONTRACTS_KEYMAP.remove(deps.storage, &Uint128::from_str(&id).unwrap());
-            //         let _ = EXPIRED_CONTRACTS_KEYMAP.insert(deps.storage, &contract.id, &contract);
-
-            //         res = Response::default()
-            //             .add_message(intial_transfer_message)
-            //             .add_message(acceptance_transfer_message)
-            //             .add_attribute_plaintext(
-            //                 notification.id_plaintext(),
-            //                 notification.data_plaintext(),
-            //         );
-
-            //     } else {
-            //         deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
-            //     }
-            // }
         }
     }
     Ok(res)
