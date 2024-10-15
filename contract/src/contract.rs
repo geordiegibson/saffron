@@ -37,7 +37,7 @@ pub fn instantiate(
         None, 
         256, 
         "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
-        "secret17prchlpws4f7xc6tsvl6yljkcnzvpp3js96v27".to_string(),
+        "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf".to_string(),
     )?;
 
     let register_nft_msg = register_receive_nft_msg(
