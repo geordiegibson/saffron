@@ -149,7 +149,6 @@ export let create_contract = async (contract: Contract) => {
 
 // Attempt to accept a contract by sending the required amount of money to the escrow with the contract_id.
 export let accept_contract = async (contract: Contract) => {
-
   let client = await createExecuteClient();
 
   let request = {
@@ -166,7 +165,7 @@ export let accept_contract = async (contract: Contract) => {
       msg: btoa(JSON.stringify(request))
     },
   };
-
+  console.log(executeMsg)
   let tx = await client.tx.compute.executeContract(
     {
       sender: await getWalletAddress(),
@@ -178,7 +177,6 @@ export let accept_contract = async (contract: Contract) => {
       gasLimit: 200_000,
     }
   );
-
   console.log(tx)
   return tx
 };

@@ -79,9 +79,13 @@ const AcceptTradeModel = (props: any) => {
         <span className="w-full inline-flex items-center justify-between p-3 bg-zinc-800 rounded-xl">
           <div className='flex w-full justify-between items-center'>
             <p className='font-bold text-white text-sm'>
-              {props.contract.offering_amount || props.contract.token_id} {offeringCoin?.abbr || ""}
+              {props.contract.offering_amount || props.contract.token_id} {offeringCoin?.abbr || "(NFT)"}
             </p>
-            {offeringCoin?.img && <img src={offeringCoin.img || props.contract.token_url} className='h-6' alt="Offering Coin" />}
+            {offeringCoin?.img ? (
+              <img src={offeringCoin.img} className='h-6' alt="Offering Coin" />
+            ) : (
+              <img src={props.contract.token_url} className='h-6' alt="Offering NFT" />
+            )}
           </div>
         </span>
       </div>

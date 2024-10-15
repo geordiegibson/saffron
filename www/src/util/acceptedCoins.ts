@@ -2,8 +2,8 @@ const secret: Coin = {
     name: "Secret",
     abbr: "SCRT",
     img: "images/SCRT.png",
-    address: "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf",
-    hash: "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe"
+    address: import.meta.env.VITE_testCoinContractAddress,
+    hash: import.meta.env.VITE_testCoinContractCodeHash
 }
 
 const ethereum: Coin = {
@@ -31,8 +31,8 @@ export function getCoinByAddr(address: string): Coin | undefined {
 
 export const nftCollection: NFT = {
     name: "nft",
-    address: "secret1j9s8zvvjzd7v6asf4wppvhphv52szxd25fh0mp",
-    hash: "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8"
+    address: import.meta.env.VITE_nftContractAddress,
+    hash: import.meta.env.VITE_nftContractCodeHash
 }
 
 // const supportedNFTs = [nft]
