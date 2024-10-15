@@ -170,7 +170,7 @@ const Trade = () => {
 
             </div>
 
-            <button className="bg-white p-3" onClick={() => notifyExample()}>Click</button>
+            <button className="bg-white p-3" onClick={() => notifyExample()}>Temporary click to register for notificiations</button>
 
             {/* Pagination */}
             <div className="w-full flex justify-center items-center mt-5 mb-20 gap-4 rounded-xl">
