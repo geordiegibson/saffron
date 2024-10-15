@@ -6,8 +6,9 @@ sudo docker run --rm -v "$(pwd)":/contract \
   enigmampc/secret-contract-optimizer
 
 # Store the contract and capture the output
-store_output=$(echo "y" | secretcli tx compute store contract.wasm.gz --gas 5000000 --from myWallet --chain-id secretdev-1)
-sleep 2
+echo "y" | secretcli tx compute store contract.wasm.gz --gas 5000000 --from myWallet --chain-id secretdev-1
+
+sleep 3
 
 # List the code and capture the output
 list_code_output=$(secretcli query compute list-code)

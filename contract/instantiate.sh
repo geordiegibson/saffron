@@ -6,8 +6,9 @@ sudo docker run --rm -v "$(pwd)":/contract \
   enigmampc/secret-contract-optimizer
 
 # Store the contract and capture the output
-store_output=$(echo "y" | secretcli tx compute store contract.wasm.gz --gas 5000000 --from myWallet --chain-id secretdev-1)
+echo "y" | secretcli tx compute store contract.wasm.gz --gas 5000000 --from myWallet --chain-id secretdev-1
 
+sleep 3
 # List the code and capture the output
 list_code_output=$(secretcli query compute list-code)
 
@@ -20,13 +21,11 @@ last_code_id=$(echo "$last_item" | jq '.code_id')
 last_code_hash=$(echo "$last_item" | jq -r '.code_hash')
 echo "$last_code_id"
 echo "$last_code_hash"
-set -a
-source .env
-set +a
 # Create a JSON object dynamically from environment variables
 # Instantiate the contract
 sleep 3
-secretcli tx compute instantiate "$last_code_id" "{"count": 1}" --from myWallet --label "counterContract$last_code_id" -y
+echo secretcli tx compute instantiate "$last_code_id" \'{"count": 1}\' --from myWallet --label "counterContract$last_code_id" -y
+secretcli tx compute instantiate "$last_code_id" '{"count": 1}' --from myWallet --label "counterContract$last_code_id" -y
 sleep 5
 # List the contracts by code
 code_addr=$(secretcli query compute list-contract-by-code "$last_code_id")

@@ -46,7 +46,7 @@ pub fn instantiate(
         None, 
         256, 
         "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(), 
-        "secret1a4dfu7atjeglkwn0vm4u25lll7x36zfdy97wkl".to_string(),
+        "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
     )?;
 
     // SNIP-52 init
@@ -135,7 +135,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                             None,
                             256,
                             "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(),
-                            "secret1a4dfu7atjeglkwn0vm4u25lll7x36zfdy97wkl".to_string(),
+                            "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
                         )?
                     } else {
                         return Err(cosmwasm_std::StdError::generic_err("Missing transfer information"));
