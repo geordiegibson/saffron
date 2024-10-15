@@ -1,6 +1,6 @@
 use schemars::JsonSchema;
 use secret_toolkit::storage::Item;
-use secret_toolkit_storage::Keymap;
+use secret_toolkit_storage::{Keymap, AppendStore};
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{Addr, Storage, Uint128};
@@ -20,6 +20,12 @@ pub struct Contract {
     pub expiration: String,
     pub token_id: Option<String>,
     pub token_url: Option<String>, 
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct ActivityStore {
+    pub contract_id: Uint128,
+    pub activity_type: u32,
 }
 
 // Client representation of a contract. user_wallet_address field removed to keep contracts anonymous.
@@ -85,5 +91,4 @@ pub static SNIP52_INTERNAL_SECRET: Item<Vec<u8>> = Item::new(b"snip52-secret");
 pub static ACTIVE_CONTRACTS_KEYMAP: Keymap<Uint128, Contract> = Keymap::new(b"active_contracts");
 pub static EXPIRED_CONTRACTS_KEYMAP: Keymap<Uint128, Contract> = Keymap::new(b"expired_contracts");
 
-pub static USER_ACTIVITIES_KEYMAP: Keymap<Uint128, u32> = Keymap::new(b"user_activities");
-
+pub static USER_ACTIVITIES_APPENDSTORE: AppendStore<ActivityStore> = AppendStore::new(b"user_activities_store");

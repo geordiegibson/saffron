@@ -1,5 +1,6 @@
 
 # Run the Docker container
+make build
 sudo docker run --rm -v "$(pwd)":/contract \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
@@ -8,7 +9,7 @@ sudo docker run --rm -v "$(pwd)":/contract \
 # Store the contract and capture the output
 echo "y" | secretcli tx compute store contract.wasm.gz --gas 5000000 --from myWallet --chain-id secretdev-1
 
-sleep 3
+sleep 7
 # List the code and capture the output
 list_code_output=$(secretcli query compute list-code)
 

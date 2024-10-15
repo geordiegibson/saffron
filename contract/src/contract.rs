@@ -11,10 +11,9 @@ use secret_toolkit::permit::Permit;
 
 use crate::msg::{Activity, ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
-use crate::state::{config, ClientContract, Contract, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
+use crate::state::{config, ClientContract, Contract, ActivityStore, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_APPENDSTORE};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 use secret_toolkit::snip721::{register_receive_nft_msg, transfer_nft_msg};
-
 pub const SEED_LEN: usize = 32;
 
 #[entry_point]
@@ -37,7 +36,7 @@ pub fn instantiate(
         None, 
         256, 
         "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
-        "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf".to_string(),
+        "secret156hpxsdku9gy90d3y3x6p3gqsqdzywz29mymaj".to_string(),
     )?;
 
     let register_nft_msg = register_receive_nft_msg(
@@ -46,7 +45,7 @@ pub fn instantiate(
         None, 
         256, 
         "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(), 
-        "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
+        "secret157ej76q872q0h4uq9qs592lv4th6yelm3mlc72".to_string(),
     )?;
 
     // SNIP-52 init
@@ -108,12 +107,20 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                 if contract.wanting_amount == amount && contract.wanting_coin_addr == info.sender.to_string() {
 
                     // Add "Accept Activity" to accepters account
-                    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
-                    let _ = user_count_store.insert(deps.storage, &contract.id, &2);
+                    let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.to_string().as_bytes());
+                    let activity_store = ActivityStore {
+                        contract_id: contract.id.clone(),
+                        activity_type: 2,
+                    }; 
+                    let _ = user_act_store.push(deps.storage, &activity_store);
 
-                    // Add "User Accepted Your Contract Activity" to original users account
-                    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
-                    let _ = user_count_store.insert(deps.storage, &contract.id, &3);    
+                    // Add "User Accepted Your Contract Activity" to original users account 
+                    let activity_store = ActivityStore {
+                        contract_id: contract.id.clone(),
+                        activity_type: 3,
+                    }; 
+                    let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.to_string().as_bytes());
+                    let _ = user_act_store.push(deps.storage, &activity_store);
 
                     let acceptance_transfer_message = if contract.offering_amount.is_some() {
                         // Clone the amount to avoid moving it
@@ -225,8 +232,12 @@ fn create_contract(
 
     // Add "Create Activity" to user's account
     let mut state = config(deps.storage).load()?; // No need to call unwrap() here, handle the error properly
-    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.as_bytes());
-    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &1);
+    let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.as_bytes());
+    let activity_store = ActivityStore {
+        contract_id:  state.current_contract_id.clone(),
+        activity_type: 1,
+    };
+    let _ = user_act_store.push(deps.storage, &activity_store);
 
     let contract = Contract {
         id: state.current_contract_id,
@@ -355,38 +366,36 @@ fn query_channel_info(
 }
 
 fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
-
     let mut activities: Vec<Activity> = Vec::new();
-    let keymap_with_suffix = USER_ACTIVITIES_KEYMAP.add_suffix(user_address.as_bytes());
+    let appendstore_with_suffix = USER_ACTIVITIES_APPENDSTORE.add_suffix(user_address.as_bytes());
+    let len = appendstore_with_suffix.get_len(deps.storage)?;
+    let start = if len > 5 { len - 5 } else { 0 };
+    deps.api.debug(&len.to_string());
 
-    let iter = keymap_with_suffix.iter(deps.storage)?;
+    for pos in (start..len) {
+        let activity_store = appendstore_with_suffix.get_at(deps.storage, pos)?;
+        deps.api.debug(&pos.to_string());
 
-    for entry in iter {
-        match entry {
-            Ok((id, activity)) => {
-                
-                let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &id);
+        let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id);
+        deps.api.debug(&activity_store.contract_id.to_string());
+        let contract = match contract {
+            Some(contract) => Some(contract),
+            None => EXPIRED_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id)
+        };
 
-                let contract = match contract {
-                    Some(contract) => Some(contract),
-                    None => EXPIRED_CONTRACTS_KEYMAP.get(deps.storage, &id)
-                };
+        if let Some(contract) = contract {
+            let activity = Activity {
+                activity_type: activity_store.activity_type,
+                contract: contract.into()
+            };
 
-                if contract.is_some() {
-                    let activity = Activity {
-                        activity_type: activity,
-                        contract: contract.unwrap().into()
-                    };
-    
-                    activities.push(activity);
-                }
-                
-            }
-            Err(err) => {
-                deps.api.debug(&format!("Error fetching activity: {:?}", err));
-            }
+            activities.push(activity);
+        }
+        
+
+        if activities.len() == 5 {
+            break;
         }
     }
-
     Ok(ActivityResponse { activity: activities })
 }
