@@ -3,7 +3,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import CryptoInput from './crypto/CryptoSelect';
 import Dropdown from './common/Dropdown';
 import { create_contract } from '../util/secretClient'
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { supportedCoins } from '../util/acceptedCoins';
 
 enum ModalState {
@@ -16,6 +16,11 @@ enum ModalState {
 
 const CreateContractModel = (props: any) => {
 
+  // NFT States
+  // Additional state for NFT
+  const [isNFT, setIsNFT] = useState(false); // Flag to check if NFT is selected
+  const [nftAddress, setNftAddress] = useState(""); // For storing NFT address
+
   // State for the form inputs
   const [givingCoin, setGivingCoin] = useState<Coin>(supportedCoins[0]);
   const [givingAmount, setGivingAmount] = useState(0);
@@ -27,22 +32,38 @@ const CreateContractModel = (props: any) => {
   const handleCreateContract = () => {
 
     setModalState(ModalState.LOADING)
-    
-    let contract: Contract = {
-      id: null,
-      offering_coin_addr: givingCoin.address,
-      offering_amount: givingAmount,
-      wanting_coin_addr: receivingCoin.address,
-      wanting_amount: receivingAmount,
-    }
+    // Define the contract based on whether it's an NFT or Coin
+    let contract: CoinContract | NFTContract;
 
+    if (isNFT) {
+      // Create NFT contract
+      contract = {
+        id: null,
+        nft_addr: nftAddress,
+        wanting_coin_addr: receivingCoin.address,
+        wanting_amount: receivingAmount,
+      } as NFTContract;
+    } else {
+      // Create Coin contract
+      contract = {
+        id: null,
+        offering_coin_addr: givingCoin.address,
+        offering_amount: givingAmount,
+        wanting_coin_addr: receivingCoin.address,
+        wanting_amount: receivingAmount,
+      } as CoinContract;
+    }
+    
+    console.log(contract)
     create_contract(contract).then((response) => {
+      console.log(response)
       if (response.code == 0) {
         setModalState(ModalState.SUCCESS)
       } else {
         setModalState(ModalState.FAIL)
       }
-    }).catch(() => {
+    }).catch((error) => {
+      console.log(error)
       setModalState(ModalState.TIMEOUT);
     })
   };
@@ -62,13 +83,23 @@ const CreateContractModel = (props: any) => {
         {modalState === ModalState.FORM &&
         <>
           <div className="mb-[15px] flex flex-col gap-1 mt-5">
+            <div className='flex gap-2 items-center'>
+              <input checked={isNFT} onChange={() => setIsNFT((prev) => !prev)} type="checkbox" className="h-5 w-5 bg-zinc-800 rounded text-gray-700" style={{ boxShadow: "none" }} />
+              <p className='text-white leading-none text-sm'>Offering an NFT instead of a Coin?</p>
+            </div>
             <label className="text-gray-400 w-[90px] text-left font-bold w-full text-xs" htmlFor="name">You Give</label>
-            <CryptoInput
-                selectedCoin={givingCoin}
-                onCoinChange={setGivingCoin}
-                amount={givingAmount}
-                onAmountChange={setGivingAmount}
-              />
+            {!isNFT ? (
+                <CryptoInput
+                  selectedCoin={givingCoin}
+                  onCoinChange={setGivingCoin}
+                  amount={givingAmount}
+                  onAmountChange={setGivingAmount}/>
+              ):(
+                <div className="relative rounded-md shadow-sm">
+                  <input type="text"  placeholder="NFT Address" value={nftAddress} onChange={(e) => setNftAddress(e.target.value)} className="w-full bg-zinc-800 text-white rounded-md border-0 py-1.5 pr-20 border-none focus:outline-none focus:ring-0 placeholder:text-gray-400 sm:text-sm sm:leading-6" />
+                </div>
+              )}
+            
           </div>
 
           <div className="mb-[15px] flex flex-col gap-1">

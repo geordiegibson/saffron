@@ -10,10 +10,10 @@ const DirectEventCreated = (props: any) => {
                 <div className="flex flex-col gap-1">
                     <p className="text-gray-500 text-xs text-center font-bold">Offering</p>
                     <div className="flex gap-3 items-center">
-                        <img className="h-8" src={getCoinByAddr(props.contract.offering_coin_addr)?.img}/>
+                        <img className="h-8" src={getCoinByAddr(props.contract.offering_coin_addr)?.img || props.contract.token_url}/>
                         <div className="flex flex-col items-end">
-                            <p className="text-white text-sm">{props.contract.offering_amount}</p>
-                            <p className="text-white text-sm">{getCoinByAddr(props.contract.offering_coin_addr)?.abbr}</p>
+                            <p className="text-white text-sm">{props.contract.offering_amount || "NFT: " + props.contract.token_id}</p>
+                            <p className="text-white text-sm">{getCoinByAddr(props.contract.offering_coin_addr)?.abbr || ""}</p>
                         </div>
                     </div>
                 </div>
