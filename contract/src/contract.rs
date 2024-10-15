@@ -13,6 +13,7 @@ use crate::msg::{Activity, ActivityResponse, ContractsResponse, ExecuteMsg, Exec
 use crate::notify::AcceptedNotificationData;
 use crate::state::{config, ClientContract, Contract, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_KEYMAP};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
+use secret_toolkit::snip721::{register_receive_nft_msg, transfer_nft_msg};
 
 pub const SEED_LEN: usize = 32;
 
@@ -35,8 +36,17 @@ pub fn instantiate(
         env.contract.code_hash.clone(), 
         None, 
         256, 
-        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
-        "secret1kw9ajrrhxxx6tdms543r92rs2ml8uqt5vsek8v".to_string(),
+        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
+        "secret1x0c5ewh0h4ts70yrj00snquqklff2ufrjwgswf".to_string(),
+    )?;
+
+    let register_nft_msg = register_receive_nft_msg(
+        env.contract.code_hash.clone(), 
+        None,
+        None, 
+        256, 
+        "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(), 
+        "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
     )?;
 
     // SNIP-52 init
@@ -55,6 +65,7 @@ pub fn instantiate(
 
     Ok(Response::new()
         .add_message(register_msg)
+        .add_message(register_nft_msg)
     )
 }
 
@@ -62,6 +73,7 @@ pub fn instantiate(
 pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {
     match msg {
         ExecuteMsg::Receive { sender, from, amount, msg } => try_receive(deps, env, info, sender, from, amount, msg),
+        ExecuteMsg::ReceiveNft { sender, token_id, msg } => try_receive_nft(deps, env, info, sender, token_id, msg),
     }
 }
 
@@ -75,29 +87,16 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
         match from_binary(&msg)? {
 
             ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
-                deps.api.debug("Received Create Request");
-                
-                // Add "Create Activity" to users account
-                let state = config(deps.storage).load().unwrap();
-                let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.to_string().as_bytes());
-                let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &1);
-
-                let contract = Contract {
-                    id: state.current_contract_id,
-                    user_wallet_address: sender.to_string(),
-                    offering_coin_addr: info.sender.to_string(), 
-                    offering_amount: amount,
-                    wanting_coin_addr: wanting_coin_addr,
-                    wanting_amount: wanting_amount,
-                    expiration: String::new(),
-                };
-
-                config(deps.storage).update::<_, StdError>(|mut state| {
-                    state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
-                    Ok(state)
-                })?;
-
-                let _ = ACTIVE_CONTRACTS_KEYMAP.insert(deps.storage, &state.current_contract_id, &contract);
+                create_contract(
+                    deps,
+                    &sender.to_string(),  
+                    wanting_coin_addr,
+                    wanting_amount,
+                    None,               // No token_id for coin trade
+                    None,               // No token_url for coin trade
+                    Some(info.sender.to_string()),
+                    Some(amount),
+                )?;
             },
 
             ExecuteReceiveMsg::Accept { id } => {
@@ -116,15 +115,31 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                     let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(contract.user_wallet_address.as_bytes());
                     let _ = user_count_store.insert(deps.storage, &contract.id, &3);    
 
-                    // Send inital currency to the user who accepted the contract
-                    let acceptance_transfer_message = transfer_msg(sender.to_string(),
-                        contract.offering_amount,
-                        None,
-                        None, 
-                        256,
-                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
-                        contract.offering_coin_addr.to_string(),
-                    )?;
+                    let acceptance_transfer_message = if contract.offering_amount.is_some() {
+                        // Clone the amount to avoid moving it
+                        transfer_msg(
+                            sender.to_string(),
+                            contract.offering_amount.clone().unwrap(), // Unwrap safely since we know it's Some
+                            None,
+                            None,
+                            256,
+                            "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(),
+                            contract.offering_coin_addr.unwrap_or_default().to_string(),
+                        )?
+                    } else if contract.token_id.is_some() {
+                        // Clone the token_id to avoid moving it
+                        transfer_nft_msg(
+                            sender.to_string(),
+                            contract.token_id.clone().unwrap(), // Unwrap safely since we know it's Some
+                            None,
+                            None,
+                            256,
+                            "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(),
+                            "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
+                        )?
+                    } else {
+                        return Err(cosmwasm_std::StdError::generic_err("Missing transfer information"));
+                    };
 
                     // Send the given money to the user who created the contract.
                     let intial_transfer_message = transfer_msg(contract.user_wallet_address.to_string(),
@@ -132,7 +147,8 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                         None,
                         None, 
                         256,
-                        "3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257".to_string(), 
+                        // 3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257
+                        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
                         contract.wanting_coin_addr.to_string(),
                     )?;
 
@@ -160,13 +176,81 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
 
                 } else {
                     deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
-                }
-            }
+                } 
+            },
+            ExecuteReceiveMsg::CreateNft { wanting_coin_addr, wanting_amount, token_url} => {}
         }
     }
     Ok(res)
 }
 
+
+pub fn try_receive_nft(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, token_id: String, msg: Option<Binary>) -> StdResult<Response> { 
+    let mut res = Response::default();
+    let secret = SNIP52_INTERNAL_SECRET.load(deps.storage)?;
+    let secret = secret.as_slice();
+    if let Some(msg) = msg {
+        match from_binary(&msg)? {
+            ExecuteReceiveMsg::CreateNft { wanting_coin_addr, wanting_amount, token_url} => {
+                create_contract(
+                    deps,
+                    &sender.to_string(), 
+                    wanting_coin_addr, 
+                    wanting_amount, 
+                    Some(token_id),   
+                    Some(token_url),   
+                    None,               // No offering_coin_addr for NFT trade
+                    None,               // No offering_amount for NFT trade
+                )?;
+            },
+
+            _ => {deps.api.debug("Recieved Call to NFT callback without the correct format");}
+        }
+    }
+    Ok(res)
+}
+
+
+fn create_contract(
+    deps: DepsMut, // Accept as mutable
+    sender: &str,
+    wanting_coin_addr: String,
+    wanting_amount: Uint128,
+    token_id: Option<String>, // Optional for NFT trades
+    token_url: Option<String>, // Optional for NFT trades
+    offering_coin_addr: Option<String>, // Optional for coin trades
+    offering_amount: Option<Uint128>,   // Optional for coin trades
+) -> Result<(), StdError> {
+    deps.api.debug("Creating Contract");
+
+    // Add "Create Activity" to user's account
+    let mut state = config(deps.storage).load()?; // No need to call unwrap() here, handle the error properly
+    let user_count_store = USER_ACTIVITIES_KEYMAP.add_suffix(sender.as_bytes());
+    let _ = user_count_store.insert(deps.storage, &state.current_contract_id, &1);
+
+    let contract = Contract {
+        id: state.current_contract_id,
+        user_wallet_address: sender.to_string(),
+        offering_coin_addr,
+        offering_amount,
+        wanting_coin_addr,
+        wanting_amount,
+        expiration: String::new(),
+        token_id,
+        token_url,
+    };
+
+    // Update the state
+    config(deps.storage).update::<_, StdError>(|mut state| {
+        state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
+        Ok(state)
+    })?;
+
+    // Insert the new contract into active contracts
+    let _ = ACTIVE_CONTRACTS_KEYMAP.insert(deps.storage, &state.current_contract_id, &contract);
+    
+    Ok(())
+}
 
 #[entry_point]
 pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -212,7 +296,7 @@ fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
             Ok(ClientContract::from(contract))
         })
         .collect::<StdResult<Vec<ClientContract>>>()?;
-
+    
    Ok(ContractsResponse { contracts: client_contracts })
 }
 
