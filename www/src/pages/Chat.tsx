@@ -3,28 +3,32 @@ import Menu from "../components/Menu";
 import Title from "../components/common/Title";
 import {
   get_personal_address,
-  // try_create_message,
-  // try_query_all_messages,
+  try_create_message,
+  try_query_all_messages,
 } from "../util/secretClient";
 
 const Chat = () => {
   const [addr, setAddr] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    { message: "This is a text app", sender: "test sender" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   setAddr(get_personal_address());
-  //   try_query_all_messages().then((messages) => {
-  //     setMessages(messages);
-  //     console.log(messages);
-  //   });
-  // }, []);
+  useEffect(() => {
+    const setAddress = async () => {
+      let personal_addr = await get_personal_address();
+      setAddr(personal_addr);
+    };
+
+    setAddress();
+
+    try_query_all_messages().then((messages) => {
+      setMessages(messages);
+      console.log(messages);
+    });
+  }, []);
 
   const addMessage = (text: string) => {
     let msg = { message: text, sender: addr };
-    // try_create_message(msg.message).then(() => setMessages([...messages, msg]));
+    try_create_message(msg.message).then(() => setMessages([...messages, msg]));
   };
 
   const messageDisplay = () => {

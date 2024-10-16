@@ -19,7 +19,7 @@ const createQueryClient = async () => {
     chainId: "secretdev-1",
     url: "http://localhost:1317",
   });
-
+  console.log("help");
   return client
 }
 
@@ -36,6 +36,11 @@ export const createExecuteClient = async () => {
 
   return client
 }
+
+// For use in determining what messages were sent by the user
+export const get_personal_address = async () => {
+  return await getWalletAddress();
+};
 
 // Fetches all escrow contracts
 export const try_query_contracts = async () => {
@@ -195,4 +200,53 @@ export const query_activity = async () => {
   console.log("Fetched Acitivity", my_query)
 
   return my_query
+};
+
+// Fetches all messages
+
+export const try_query_all_messages = async () => {
+  try {
+
+    let client = await createQueryClient();
+    const my_query: { messages: Array<Message> } =
+      await client.query.compute.queryContract({
+        contract_address: import.meta.env.VITE_contractAddress as string,
+        code_hash: import.meta.env.VITE_contractCodeHash,
+        query: { get_all_messages: {} },
+      });
+
+    return my_query.messages;
+  } catch (error) {
+    console.error("Error querying all messages:", error);
+    return []; // Return an empty array or handle the error appropriately.
+  }
+};
+
+// Attempts to create a message
+export const try_create_message = async (message: string) => {
+  try {
+
+    const client = await createExecuteClient();
+
+    console.log("Creating message");
+    await client.tx.compute.executeContract(
+      {
+        sender: await getWalletAddress(),
+        contract_address: import.meta.env.VITE_contractAddress as string,
+        code_hash: import.meta.env.VITE_contractCodeHash,
+        msg: {
+          add_message: {
+            message: message,
+          },
+        },
+        sent_funds: [],
+      },
+      {
+        gasLimit: 100_000,
+      }
+    );
+    console.log("Success");
+  } catch (err) {
+    console.log("Error: ", err);
+  }
 };

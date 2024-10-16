@@ -1,13 +1,11 @@
+use crate::state::{Activity, ClientContract, Message};
 use cosmwasm_std::{Addr, Binary, Uint128, Uint64};
 use schemars::JsonSchema;
 use secret_toolkit::{notification::ChannelInfoData, permit::Permit};
 use serde::{Deserialize, Serialize};
-use crate::state::{ClientContract, Activity};
-
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
-
 
 // Defines all possilbe state modifying requests.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
@@ -23,13 +21,15 @@ pub enum ExecuteMsg {
         sender: Addr,
         token_id: String,
         msg: Option<Binary>,
-    }
+    },
+    AddMessage {
+        message: String,
+    },
 }
-
 
 // Defines the types of messages that come back from the RegisterReceive callbacks (when the contract takes ownership of currency).
 // These indicate whether someone is sending us money to create a contract, or fullfill another users contract.
-#[derive(Serialize,Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteReceiveMsg {
     Create {
@@ -42,10 +42,9 @@ pub enum ExecuteReceiveMsg {
         token_url: String,
     },
     Accept {
-        id: String
-    }
+        id: String,
+    },
 }
-
 
 // Defines all possilbe non-modifying requests.
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
@@ -53,13 +52,15 @@ pub enum ExecuteReceiveMsg {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     GetContracts {},
-    GetActivity { user_address: String },
+    GetActivity {
+        user_address: String,
+    },
+    GetAllMessages {},
     WithPermit {
         permit: Permit,
         query: QueryWithPermit,
     },
 }
-
 
 // SNIP-52 Private Push Notifications. Used to authenticate users on non-modifying queries.
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
@@ -70,9 +71,7 @@ pub enum QueryWithPermit {
         channels: Vec<String>,
         txhash: Option<String>,
     },
-    
 }
-
 
 // SNIP-52
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
@@ -87,16 +86,20 @@ pub enum QueryAnswer {
     },
 }
 
-
 // Sending back the list of all available contracts.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ContractsResponse {
-    pub contracts: Vec<ClientContract>
+    pub contracts: Vec<ClientContract>,
 }
-
 
 // Sending back a list of users recent activities.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ActivityResponse {
-    pub activity: Vec<Activity>
+    pub activity: Vec<Activity>,
+}
+
+// Sending back a list of all global messages
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
+pub struct MessagesResponse {
+    pub messages: Vec<Message>,
 }
