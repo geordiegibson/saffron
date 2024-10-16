@@ -124,7 +124,7 @@ secretcli tx compute instantiate <contract_id> '{
 }' --from myWallet --label "test contract'"$(echo $((RANDOM * 10000000)))"'" --gas 400000 --yes
 ```
 
-Make sure to record the contract_hash and contract_address. Then add them within the contract directory:
+Make sure to record the contract_hash and contract_address. Then add them within the contract directory (contract.rs):
 
 ```
 let coin_hash = "";
