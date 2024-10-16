@@ -2,11 +2,14 @@ use cosmwasm_std::{Addr, Binary, Uint128, Uint64};
 use schemars::JsonSchema;
 use secret_toolkit::{notification::ChannelInfoData, permit::Permit};
 use serde::{Deserialize, Serialize};
-use crate::state::ClientContract;
+use crate::state::{ClientContract, Activity};
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
 
+
+// Defines all possilbe state modifying requests.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
@@ -23,6 +26,9 @@ pub enum ExecuteMsg {
     }
 }
 
+
+// Defines the types of messages that come back from the RegisterReceive callbacks (when the contract takes ownership of currency).
+// These indicate whether someone is sending us money to create a contract, or fullfill another users contract.
 #[derive(Serialize,Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteReceiveMsg {
@@ -40,6 +46,8 @@ pub enum ExecuteReceiveMsg {
     }
 }
 
+
+// Defines all possilbe non-modifying requests.
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 #[serde(rename_all = "snake_case")]
@@ -52,11 +60,12 @@ pub enum QueryMsg {
     },
 }
 
+
+// SNIP-52 Private Push Notifications. Used to authenticate users on non-modifying queries.
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 #[serde(rename_all = "snake_case")]
 pub enum QueryWithPermit {
-    // SNIP-52 Private Push Notifications
     ChannelInfo {
         channels: Vec<String>,
         txhash: Option<String>,
@@ -64,6 +73,8 @@ pub enum QueryWithPermit {
     
 }
 
+
+// SNIP-52
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryAnswer {
@@ -76,17 +87,15 @@ pub enum QueryAnswer {
     },
 }
 
+
+// Sending back the list of all available contracts.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ContractsResponse {
     pub contracts: Vec<ClientContract>
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
-pub struct Activity {
-    pub activity_type: u32,
-    pub contract: ClientContract
-}
 
+// Sending back a list of users recent activities.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct ActivityResponse {
     pub activity: Vec<Activity>

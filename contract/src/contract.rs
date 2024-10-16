@@ -9,13 +9,15 @@ use secret_toolkit::crypto::{hkdf_sha_256, sha_256, ContractPrng};
 use secret_toolkit::notification::{get_seed, notification_id, ChannelInfoData, Notification, NotificationData};
 use secret_toolkit::permit::Permit;
 
-use crate::msg::{Activity, ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
+use crate::msg::{ActivityResponse, ContractsResponse, ExecuteMsg, ExecuteReceiveMsg, InstantiateMsg, QueryAnswer, QueryMsg, QueryWithPermit};
 use crate::notify::AcceptedNotificationData;
-use crate::state::{config, ClientContract, Contract, ActivityStore, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_APPENDSTORE};
+use crate::state::{config, ClientContract, Contract, Activity, ActivityStore, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_APPENDSTORE};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 use secret_toolkit::snip721::{register_receive_nft_msg, transfer_nft_msg};
 pub const SEED_LEN: usize = 32;
 
+
+// Called when the contract is instantiated. Registers callbacks for when we receive coins / NFTS.
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
@@ -39,6 +41,7 @@ pub fn instantiate(
         "secret156hpxsdku9gy90d3y3x6p3gqsqdzywz29mymaj".to_string(),
     )?;
 
+    // Register for SNIP-721 callback
     let register_nft_msg = register_receive_nft_msg(
         env.contract.code_hash.clone(), 
         None,
@@ -68,6 +71,8 @@ pub fn instantiate(
     )
 }
 
+
+// State modifying requests.
 #[entry_point]
 pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {
     match msg {
@@ -76,6 +81,8 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     }
 }
 
+
+// Called when this contract address recieves a coin.
 pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _from: Addr, amount: Uint128, msg: Option<Binary>) -> StdResult<Response> {
     
     let mut res = Response::default();
@@ -85,19 +92,22 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
     if let Some(msg) = msg {
         match from_binary(&msg)? {
 
+            // If the received message from the RegisterReceive callback contains
             ExecuteReceiveMsg::Create { wanting_coin_addr, wanting_amount } => {
                 create_contract(
                     deps,
                     &sender.to_string(),  
                     wanting_coin_addr,
                     wanting_amount,
-                    None,               // No token_id for coin trade
-                    None,               // No token_url for coin trade
+                    None, // No token_id for coin trade
+                    None, // No token_url for coin trade
                     Some(info.sender.to_string()),
                     Some(amount),
                 )?;
             },
 
+            // In the event of a user accepting another users trade, the received message from the RegisterReceive callback will
+            // contain the id of the contract they are attempting to accept.
             ExecuteReceiveMsg::Accept { id } => {
                 deps.api.debug("Valid Accept Request");
 
@@ -122,11 +132,11 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                     let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.to_string().as_bytes());
                     let _ = user_act_store.push(deps.storage, &activity_store);
 
+                    // Create the 
                     let acceptance_transfer_message = if contract.offering_amount.is_some() {
-                        // Clone the amount to avoid moving it
                         transfer_msg(
                             sender.to_string(),
-                            contract.offering_amount.clone().unwrap(), // Unwrap safely since we know it's Some
+                            contract.offering_amount.clone().unwrap(),
                             None,
                             None,
                             256,
@@ -134,10 +144,9 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                             contract.offering_coin_addr.unwrap_or_default().to_string(),
                         )?
                     } else if contract.token_id.is_some() {
-                        // Clone the token_id to avoid moving it
                         transfer_nft_msg(
                             sender.to_string(),
-                            contract.token_id.clone().unwrap(), // Unwrap safely since we know it's Some
+                            contract.token_id.clone().unwrap(),
                             None,
                             None,
                             256,
@@ -154,7 +163,6 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                         None,
                         None, 
                         256,
-                        // 3aad972a2c59b248993a22091d12b2774a347e10581af20595abc4d977080257
                         "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
                         contract.wanting_coin_addr.to_string(),
                     )?;
@@ -185,17 +193,16 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                     deps.api.debug("Shame on you for trying to trick the system, you're not getting your money back");
                 } 
             },
-            ExecuteReceiveMsg::CreateNft { wanting_coin_addr, wanting_amount, token_url} => {}
+            _ => {}
         }
     }
     Ok(res)
 }
 
 
-pub fn try_receive_nft(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, token_id: String, msg: Option<Binary>) -> StdResult<Response> { 
-    let mut res = Response::default();
-    let secret = SNIP52_INTERNAL_SECRET.load(deps.storage)?;
-    let secret = secret.as_slice();
+// Called when this contract address recieves an NFT.
+pub fn try_receive_nft(deps: DepsMut, _env: Env, _info: MessageInfo, sender: Addr, token_id: String, msg: Option<Binary>) -> StdResult<Response> { 
+    let res = Response::default();
     if let Some(msg) = msg {
         match from_binary(&msg)? {
             ExecuteReceiveMsg::CreateNft { wanting_coin_addr, wanting_amount, token_url} => {
@@ -206,8 +213,8 @@ pub fn try_receive_nft(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr,
                     wanting_amount, 
                     Some(token_id),   
                     Some(token_url),   
-                    None,               // No offering_coin_addr for NFT trade
-                    None,               // No offering_amount for NFT trade
+                    None, // No offering_coin_addr for NFT trade
+                    None, // No offering_amount for NFT trade
                 )?;
             },
 
@@ -218,6 +225,7 @@ pub fn try_receive_nft(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr,
 }
 
 
+// Creates a trade item that will display to allow users.
 fn create_contract(
     deps: DepsMut, // Accept as mutable
     sender: &str,
@@ -231,7 +239,7 @@ fn create_contract(
     deps.api.debug("Creating Contract");
 
     // Add "Create Activity" to user's account
-    let mut state = config(deps.storage).load()?; // No need to call unwrap() here, handle the error properly
+    let state = config(deps.storage).load()?;
     let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.as_bytes());
     let activity_store = ActivityStore {
         contract_id:  state.current_contract_id.clone(),
@@ -251,18 +259,19 @@ fn create_contract(
         token_url,
     };
 
-    // Update the state
+    // Insert the new contract into active contracts
     config(deps.storage).update::<_, StdError>(|mut state| {
         state.current_contract_id = Uint128::new(state.current_contract_id.u128() + 1);
         Ok(state)
     })?;
 
-    // Insert the new contract into active contracts
     let _ = ACTIVE_CONTRACTS_KEYMAP.insert(deps.storage, &state.current_contract_id, &contract);
     
     Ok(())
 }
 
+
+// Non-modifying queries (no wallet attatched).
 #[entry_point]
 pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
@@ -272,13 +281,15 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
+
+// Used for SNIP-52 to authenticate users on query requests.
 fn permit_queries(
     deps: Deps,
     env: Env,
     permit: Permit,
     query: QueryWithPermit,
 ) -> Result<Binary, StdError> {
-    // Validate permit content
+
     let token_address = env.contract.address.clone();
 
     let account = secret_toolkit::permit::validate(
@@ -300,6 +311,8 @@ fn permit_queries(
     }
 }
 
+
+// Fetch all live contracts (trade items).
 fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
     
     let client_contracts: Vec<ClientContract> = ACTIVE_CONTRACTS_KEYMAP.iter(deps.storage)?.map(|item| {
@@ -311,11 +324,48 @@ fn query_contracts(deps: Deps) -> StdResult<ContractsResponse> {
    Ok(ContractsResponse { contracts: client_contracts })
 }
 
-///
+
+// Fetches the five most recent actions for a given user address (Future work would include making this authenticated).
+fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
+    let mut activities: Vec<Activity> = Vec::new();
+    let appendstore_with_suffix = USER_ACTIVITIES_APPENDSTORE.add_suffix(user_address.as_bytes());
+    let len = appendstore_with_suffix.get_len(deps.storage)?;
+    let start = if len > 5 { len - 5 } else { 0 };
+    deps.api.debug(&len.to_string());
+
+    for pos in start..len {
+        let activity_store = appendstore_with_suffix.get_at(deps.storage, pos)?;
+        deps.api.debug(&pos.to_string());
+
+        let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id);
+        deps.api.debug(&activity_store.contract_id.to_string());
+        let contract = match contract {
+            Some(contract) => Some(contract),
+            None => EXPIRED_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id)
+        };
+
+        if let Some(contract) = contract {
+            let activity = Activity {
+                activity_type: activity_store.activity_type,
+                contract: contract.into()
+            };
+
+            activities.push(activity);
+        }
+        
+
+        if activities.len() == 5 {
+            break;
+        }
+    }
+    Ok(ActivityResponse { activity: activities })
+}
+
+
 /// ChannelInfo query
 ///
-///   Authenticated query allows clients to obtain the seed,
-///   and Notification ID of an event for a specific tx_hash, for a specific channel.
+/// Authenticated query allows clients to obtain the seed,
+/// and Notification ID of an event for a specific tx_hash, for a specific channel.
 ///
 fn query_channel_info(
     deps: Deps,
@@ -363,39 +413,4 @@ fn query_channel_info(
         channels: channels_data,
         seed,
     })
-}
-
-fn query_activity(deps: Deps, user_address: String) -> StdResult<ActivityResponse> {
-    let mut activities: Vec<Activity> = Vec::new();
-    let appendstore_with_suffix = USER_ACTIVITIES_APPENDSTORE.add_suffix(user_address.as_bytes());
-    let len = appendstore_with_suffix.get_len(deps.storage)?;
-    let start = if len > 5 { len - 5 } else { 0 };
-    deps.api.debug(&len.to_string());
-
-    for pos in (start..len) {
-        let activity_store = appendstore_with_suffix.get_at(deps.storage, pos)?;
-        deps.api.debug(&pos.to_string());
-
-        let contract = ACTIVE_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id);
-        deps.api.debug(&activity_store.contract_id.to_string());
-        let contract = match contract {
-            Some(contract) => Some(contract),
-            None => EXPIRED_CONTRACTS_KEYMAP.get(deps.storage, &activity_store.contract_id)
-        };
-
-        if let Some(contract) = contract {
-            let activity = Activity {
-                activity_type: activity_store.activity_type,
-                contract: contract.into()
-            };
-
-            activities.push(activity);
-        }
-        
-
-        if activities.len() == 5 {
-            break;
-        }
-    }
-    Ok(ActivityResponse { activity: activities })
 }

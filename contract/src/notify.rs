@@ -3,10 +3,11 @@ use secret_toolkit::notification::NotificationData;
 use minicbor_ser as cbor;
 use serde::{Deserialize, Serialize};
 
+
+// SNIP-52 Push Notifications
 #[derive(Serialize, Debug, Deserialize, Clone)]
 pub struct AcceptedNotificationData {
     pub id: String,
-    // maybe add other fields?
 }
 
 impl NotificationData for AcceptedNotificationData {
