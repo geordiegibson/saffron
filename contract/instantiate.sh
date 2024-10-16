@@ -1,6 +1,6 @@
 
 # Run the Docker container
-make build
+cargo build
 sudo docker run --rm -v "$(pwd)":/contract \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
