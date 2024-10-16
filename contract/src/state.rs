@@ -13,7 +13,6 @@ pub static ACTIVE_CONTRACTS_KEYMAP: Keymap<Uint128, Contract> = Keymap::new(b"ac
 pub static EXPIRED_CONTRACTS_KEYMAP: Keymap<Uint128, Contract> = Keymap::new(b"expired_contracts");
 pub static USER_ACTIVITIES_APPENDSTORE: AppendStore<ActivityStore> = AppendStore::new(b"user_activities_store");
 
-
 // Complete contract details stored on the server.
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, JsonSchema)]
 pub struct Contract {

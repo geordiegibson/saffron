@@ -14,6 +14,8 @@ use crate::notify::AcceptedNotificationData;
 use crate::state::{config, ClientContract, Contract, Activity, ActivityStore, State, ACTIVE_CONTRACTS_KEYMAP, EXPIRED_CONTRACTS_KEYMAP, SNIP52_INTERNAL_SECRET, USER_ACTIVITIES_APPENDSTORE};
 use secret_toolkit::snip20::{register_receive_msg, transfer_msg};
 use secret_toolkit::snip721::{register_receive_nft_msg, transfer_nft_msg};
+
+
 pub const SEED_LEN: usize = 32;
 
 
@@ -32,13 +34,38 @@ pub fn instantiate(
 
     config(deps.storage).save(&state)?;
 
-    // Register for SNIP-20 callback
-    let register_msg = register_receive_msg(
+    let coin_hash = "38ca273d3602a4bdafc25080a049f25e8a00ca8144a8c526241e8cb2e8f0baf5";
+    let scrt_addr = "secret14ndaswjg2cntwe24rn5rthy7eaqqm0d7k6vaus";
+    let eth_addr = "secret1ayp9q4glfgly37eavy00ft7tx3v8a6u57rkrtm";
+    let shd_addr = "secret1uaww4sj23lrq823a7c54akzsw9fue73ujwtl5d";
+    let nft_hash = "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8";
+    let nft_addr = "secret16x48pd4j9sprs6fdqmpka7ld7sjvy4qdqj2hsz";
+
+    // Register for SNIP-20 callback - Coin 1
+    let register_msg1 = register_receive_msg(
         env.contract.code_hash.clone(), 
         None, 
         256, 
-        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
-        "secret156hpxsdku9gy90d3y3x6p3gqsqdzywz29mymaj".to_string(),
+        coin_hash.to_string(), 
+        scrt_addr.to_string(),
+    )?;
+    
+    // Register for SNIP-20 callback - Coin 2
+    let register_msg2 = register_receive_msg(
+        env.contract.code_hash.clone(), 
+        None, 
+        256, 
+        coin_hash.to_string(), 
+        eth_addr.to_string(),
+    )?;
+
+    // Register for SNIP-20 callback - Coin 3
+    let register_msg3 = register_receive_msg(
+        env.contract.code_hash.clone(), 
+        None, 
+        256, 
+        coin_hash.to_string(), 
+        shd_addr.to_string(),
     )?;
 
     // Register for SNIP-721 callback
@@ -47,8 +74,8 @@ pub fn instantiate(
         None,
         None, 
         256, 
-        "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(), 
-        "secret157ej76q872q0h4uq9qs592lv4th6yelm3mlc72".to_string(),
+        nft_hash.to_string(), 
+        nft_addr.to_string(),
     )?;
 
     // SNIP-52 init
@@ -66,7 +93,9 @@ pub fn instantiate(
     SNIP52_INTERNAL_SECRET.save(deps.storage, &internal_secret)?;
 
     Ok(Response::new()
-        .add_message(register_msg)
+        .add_message(register_msg1)        
+        .add_message(register_msg2)
+        .add_message(register_msg3)
         .add_message(register_nft_msg)
     )
 }
@@ -132,7 +161,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                     let user_act_store = USER_ACTIVITIES_APPENDSTORE.add_suffix(sender.to_string().as_bytes());
                     let _ = user_act_store.push(deps.storage, &activity_store);
 
-                    // Create the 
+                    // Send the original money / NFT to the user who accepted the contract.
                     let acceptance_transfer_message = if contract.offering_amount.is_some() {
                         transfer_msg(
                             sender.to_string(),
@@ -140,7 +169,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                             None,
                             None,
                             256,
-                            "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(),
+                            "38ca273d3602a4bdafc25080a049f25e8a00ca8144a8c526241e8cb2e8f0baf5".to_string(),
                             contract.offering_coin_addr.unwrap_or_default().to_string(),
                         )?
                     } else if contract.token_id.is_some() {
@@ -151,7 +180,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                             None,
                             256,
                             "773c39a4b75d87c4d04b6cfe16d32cd5136271447e231b342f7467177c363ca8".to_string(),
-                            "secret174jazqd0eaws2gah7gc6j0g5tmewdwmppxvkrg".to_string(),
+                            "secret16x48pd4j9sprs6fdqmpka7ld7sjvy4qdqj2hsz".to_string(),
                         )?
                     } else {
                         return Err(cosmwasm_std::StdError::generic_err("Missing transfer information"));
@@ -163,7 +192,7 @@ pub fn try_receive(deps: DepsMut, env: Env, info: MessageInfo, sender: Addr, _fr
                         None,
                         None, 
                         256,
-                        "c74bc4b0406507257ed033caa922272023ab013b0c74330efc16569528fa34fe".to_string(), 
+                        "38ca273d3602a4bdafc25080a049f25e8a00ca8144a8c526241e8cb2e8f0baf5".to_string(), 
                         contract.wanting_coin_addr.to_string(),
                     )?;
 
