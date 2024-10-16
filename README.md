@@ -137,7 +137,7 @@ let nft_addr = "";
 
 AS WELL AS on lines 172 and 182-183 and 195. 
 
-and within the www directory:
+and within the www directory .env:
 
 ```
 VITE_nftContractAddress=""
